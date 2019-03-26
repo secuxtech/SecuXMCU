@@ -1,0 +1,4 @@
+Version 1.16
+1. Fix bug: usb is not worked on MAC and Linux 
+2. Add feature: modify device system info page - version info
+3. Add feature: refresh account frame in appropriate situation
