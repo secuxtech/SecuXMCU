@@ -1,3 +1,10 @@
+Version 1.17
+1. Refine page button sensing area
+2. Fix bug: bitcoin legacy transaction failed on multiple UTXO
+3. Disable usb auto reset function
+4. Refine upgrading performance
+5. Modify UI
+
 Version 1.16
 1. Fix bug: usb is not worked on MAC and Linux 
 2. Add feature: modify device system info page - version info
