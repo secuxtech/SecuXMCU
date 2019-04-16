@@ -70,6 +70,7 @@ int main(void)
 {
     uint32_t err_code;
 	uint8_t index = 0;
+    bool power_ret = false;
 
     // Initialize.
     log_init();
@@ -98,8 +99,11 @@ int main(void)
     NRF_LOG_INFO("Secux started");
     application_timers_start();
     //advertising_start();
-    start_system();
-
+    power_ret = check_remaining_battery();
+    if (power_ret == true)
+    {
+        start_system();
+    }
     // Enter main loop.
     for (;;)
     {
