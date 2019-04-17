@@ -70,6 +70,7 @@ int main(void)
 {
     uint32_t err_code;
 	uint8_t index = 0;
+    bool is_power_ready = false;
 
     // Initialize.
     log_init();
@@ -87,18 +88,22 @@ int main(void)
     NRF_LOG_INFO("Hello USB!");
     NRF_LOG_FLUSH();
     usb21_init();
-
     ikv_spim_init();
-    lcm_init();
-    
     if(option_pin_mode0 == true)
     saadc_init();
+    
+    lcm_init();
+    crypto_init();
 		
     // Start execution.
     NRF_LOG_INFO("Secux started");
     application_timers_start();
     //advertising_start();
-
+    is_power_ready = check_remaining_battery();
+    if (is_power_ready == true)
+    {
+        start_system();
+    }
     // Enter main loop.
     for (;;)
     {
