@@ -1,3 +1,9 @@
+Version 1.18
+1. Refine system performance
+2. Add new warning messages for low battery and PIN code error
+3. Modify system information content
+4. Fix bug: display incorrect info while deleting account through Bluetooth
+
 Version 1.17
 1. Refine page button sensing area
 2. Fix bug: bitcoin legacy transaction failed on multiple UTXO
