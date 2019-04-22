@@ -1,3 +1,7 @@
+Version 1.19
+1. Increace the capacity of QR code
+2. Fix bug: incorrect amount display in XRP
+
 Version 1.18
 1. Refine system performance
 2. Add new warning messages for low battery and PIN code error
