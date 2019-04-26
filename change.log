@@ -1,3 +1,8 @@
+Version 1.20
+1. Optimize the performance of bluetooth and USB
+2. Improve the user experience
+3. Enable feature get account address
+
 Version 1.19
 1. Increace the capacity of QR code
 2. Fix bug: incorrect amount display in XRP
