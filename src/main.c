@@ -89,18 +89,18 @@ int main(void)
     NRF_LOG_FLUSH();
     usb21_init();
     ikv_spim_init();
-    if(option_pin_mode0 == true)
-    saadc_init();
-    
     lcm_init();
     crypto_init();
-		
+    if(option_pin_mode0 == true)
+    {
+        saadc_init();
+        is_power_ready = check_remaining_battery();
+    }
     // Start execution.
     NRF_LOG_INFO("Secux started");
     application_timers_start();
     //advertising_start();
-    is_power_ready = check_remaining_battery();
-    if (is_power_ready == true)
+    if (is_power_ready == true || option_pin_mode0 == false)
     {
         start_system();
     }
