@@ -150,7 +150,7 @@ uint8_t grs_icon_bitmap[72] =
 	0x00, 0x7F, 0x00, //          #######     
 };    
                 
-uint8_t token_bnb_icon_bitmap[72] = 
+uint8_t bnb_icon_bitmap[72] = 
 {   
     0x00, 0x18, 0x00, //            ##           
     0x00, 0x3C, 0x00, //           ####          
