@@ -780,3 +780,12 @@ groestl512_DoubleTrunc(void *cc, void *dst)
 	groestl512_Final(cc, buf);
 	memcpy(dst, buf, 32);
 }
+
+void
+groestl512_DoubleTrunc_function(const void *data, size_t len, void *dst)
+{
+    sph_groestl_big_context GROESTL512_CTX;  
+    groestl512_Init(&GROESTL512_CTX);
+    groestl512_Update(&GROESTL512_CTX, data, len);
+    groestl512_DoubleTrunc(&GROESTL512_CTX, dst);
+}
