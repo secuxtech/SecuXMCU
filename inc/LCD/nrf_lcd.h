@@ -111,6 +111,17 @@ typedef struct
     void (* lcd_rect_draw)(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color);
 
     /**
+     * @brief Function for drawing a filled rectangle by input data.
+     *
+     * @param[in] x             Horizontal coordinate of the point where to start drawing the rectangle.
+     * @param[in] y             Vertical coordinate of the point where to start drawing the rectangle.
+     * @param[in] width         Width of the image.
+     * @param[in] height        Height of the image.
+     * @param[in] data          Color data with which to fill the rectangle in LCD accepted format.
+     */
+    void (* lcd_rect_draw_data)(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *data);
+    
+    /**
      * @brief Function for displaying data from an internal frame buffer.
      *
      * This function may be used when functions for drawing do not write directly to

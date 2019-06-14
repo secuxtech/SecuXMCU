@@ -443,6 +443,9 @@ void st7789_pixel_draw(uint16_t x, uint16_t y, uint32_t color)
     nrf_gpio_pin_clear(ST7789_DC_PIN);
 }
 
+#define SPI_TX_BYTES_LIMIT      240
+#define SPI_TX_PIXELS_LIMIT     80
+
 static void st7789_rect_draw(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint32_t color)
 {
     set_addr_window(x, y, x + width - 1, y + height - 1);
@@ -450,7 +453,7 @@ static void st7789_rect_draw(uint16_t x, uint16_t y, uint16_t width, uint16_t he
     //color = RGB2BGR(color);
 
     //const uint8_t data[3] = { (color>>16)&0xFF , (color>>8)&0xFF , color&0xFF };
-		uint8_t data[240];
+		uint8_t data[SPI_TX_BYTES_LIMIT];
 		uint8_t len;
 		uint8_t i,j;
 		uint8_t t_80,m_80;
@@ -462,8 +465,8 @@ static void st7789_rect_draw(uint16_t x, uint16_t y, uint16_t width, uint16_t he
 		g_color=(color>>8)&0xFF;
 		b_color=color&0xFF;
 		len=0;
-		if (width>=80){
-				for (i=0;i<80;i++) {
+		if (width>=SPI_TX_PIXELS_LIMIT){
+				for (i=0;i<SPI_TX_PIXELS_LIMIT;i++) {
 					data[len++]=r_color;
 					data[len++]=g_color;
 					data[len++]=b_color;
@@ -475,12 +478,12 @@ static void st7789_rect_draw(uint16_t x, uint16_t y, uint16_t width, uint16_t he
 					data[len++]=b_color;
 				}
 		}
-		t_80=width/80;
-		m_80=width%80;
+		t_80=width/SPI_TX_PIXELS_LIMIT;
+		m_80=width%SPI_TX_PIXELS_LIMIT;
 		for (i=0;i<height;i++) {
 			if (t_80>0) {
 				for (j=0;j<t_80;j++) {
-					nrf_drv_spi_transfer(&spi, data, 240, NULL, 0);
+					nrf_drv_spi_transfer(&spi, data, SPI_TX_BYTES_LIMIT, NULL, 0);
 				}
 			}
 			if (m_80>0) {
@@ -517,6 +520,27 @@ static void st7789_rect_draw(uint16_t x, uint16_t y, uint16_t width, uint16_t he
             break;
     }
 //lint -restore */
+
+    nrf_gpio_pin_clear(ST7789_DC_PIN);
+}
+
+static void st7789_rect_draw_data(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *data)
+{
+    uint8_t _data[SPI_TX_BYTES_LIMIT];
+    uint32_t bytes = 0;
+    uint8_t size = 0;
+
+    set_addr_window(x, y, x + width - 1, y + height - 1);
+    nrf_gpio_pin_set(ST7789_DC_PIN);
+
+    for (int i = 0; i < width*height;)
+    {
+        size = i + SPI_TX_PIXELS_LIMIT < width*height ? SPI_TX_PIXELS_LIMIT : width*height - i;
+        memcpy(_data, data + bytes, size * 3);
+        nrf_drv_spi_transfer(&spi, _data, size * 3, NULL, 0);
+        bytes += size * 3;
+        i += size;
+    }
 
     nrf_gpio_pin_clear(ST7789_DC_PIN);
 }
@@ -614,6 +638,7 @@ const nrf_lcd_t nrf_lcd_st7789 = {
     .lcd_uninit = st7789_uninit,
     .lcd_pixel_draw = st7789_pixel_draw,
     .lcd_rect_draw = st7789_rect_draw,
+    .lcd_rect_draw_data = st7789_rect_draw_data,
     .lcd_display = st7789_dummy_display,
     .lcd_rotation_set = st7789_rotation_set,
     .lcd_display_invert = st7789_display_invert,
