@@ -343,6 +343,7 @@ ret_code_t nrf_gfx_bmp666_draw(nrf_lcd_t const * p_instance,
 ret_code_t nrf_gfx_bmp888_draw(nrf_lcd_t const * p_instance,
                                nrf_gfx_rect_t const * p_rect,
                                uint8_t * img_buf);
-												 
+
+void nrf_clear_screen(nrf_lcd_t const * p_instance);                               										 
 #endif //NRF_GFX_H__
 

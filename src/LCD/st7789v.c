@@ -460,7 +460,7 @@ static void st7789_rect_draw(uint16_t x, uint16_t y, uint16_t width, uint16_t he
 		uint8_t r_color;
 		uint8_t g_color;
  		uint8_t b_color;
-   nrf_gpio_pin_set(ST7789_DC_PIN);
+        nrf_gpio_pin_set(ST7789_DC_PIN);
 		r_color=(color>>16)&0xFF;
 		g_color=(color>>8)&0xFF;
 		b_color=color&0xFF;
@@ -605,12 +605,10 @@ static void st7789_display_invert(bool invert)
     write_command(invert ? ST7789_INVON : ST7789_INVOFF);
 }
 
-static void st7789_clear_screen(uint16_t width,uint16_t height)
+void st7789_clear_screen(uint16_t width,uint16_t height)
 {
     set_addr_window(0, 0, width - 1,  height - 1);
-
     //color = RGB2BGR(color);
-
     uint8_t data[240] ;
 		memset(data,0,sizeof(data));
     nrf_gpio_pin_set(ST7789_DC_PIN);
@@ -622,7 +620,6 @@ static void st7789_clear_screen(uint16_t width,uint16_t height)
 		}
 /*lint -restore */
     nrf_gpio_pin_clear(ST7789_DC_PIN);
-
 }
 
 
