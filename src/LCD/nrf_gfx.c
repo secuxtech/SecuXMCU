@@ -231,6 +231,7 @@ ret_code_t nrf_gfx_init(nrf_lcd_t const * p_instance)
     ASSERT(p_instance->lcd_uninit != NULL);
     ASSERT(p_instance->lcd_pixel_draw != NULL);
     ASSERT(p_instance->lcd_rect_draw != NULL);
+    ASSERT(p_instance->lcd_rect_draw_data != NULL);
     ASSERT(p_instance->lcd_display != NULL);
     ASSERT(p_instance->lcd_rotation_set != NULL);
     ASSERT(p_instance->lcd_display_invert != NULL);
