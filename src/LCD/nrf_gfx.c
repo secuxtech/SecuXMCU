@@ -51,6 +51,13 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
+void nrf_clear_screen(nrf_lcd_t const * p_instance)
+{
+    uint16_t lcd_width = nrf_gfx_width_get(p_instance);
+    uint16_t lcd_height = nrf_gfx_height_get(p_instance);
+    p_instance->lcd_clear_screen(lcd_width, lcd_height);
+}
+
 static inline void pixel_draw(nrf_lcd_t const * p_instance,
                               uint16_t x,
                               uint16_t y,
@@ -228,6 +235,7 @@ ret_code_t nrf_gfx_init(nrf_lcd_t const * p_instance)
     ASSERT(p_instance->lcd_rotation_set != NULL);
     ASSERT(p_instance->lcd_display_invert != NULL);
     ASSERT(p_instance->p_lcd_cb != NULL);
+    ASSERT(p_instance->lcd_clear_screen != NULL);
 
     ret_code_t err_code;
 
