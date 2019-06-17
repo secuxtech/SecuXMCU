@@ -94,4 +94,6 @@ void groestl512_Final(void *cc, void *dst);
 /* Calculate double Groestl-512 hash and truncate it to 256-bits. */
 void groestl512_DoubleTrunc(void *cc, void *dst);
 
+/* Function Module: Calculate double Groestl-512 hash and truncate it to 256-bits. */
+void groestl512_DoubleTrunc_function(const void *data, size_t len, void *dst);
 #endif
