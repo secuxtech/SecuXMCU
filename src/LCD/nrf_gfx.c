@@ -51,6 +51,13 @@
 #include "nrf_log.h"
 NRF_LOG_MODULE_REGISTER();
 
+void nrf_clear_screen(nrf_lcd_t const * p_instance)
+{
+    uint16_t lcd_width = nrf_gfx_width_get(p_instance);
+    uint16_t lcd_height = nrf_gfx_height_get(p_instance);
+    p_instance->lcd_clear_screen(lcd_width, lcd_height);
+}
+
 static inline void pixel_draw(nrf_lcd_t const * p_instance,
                               uint16_t x,
                               uint16_t y,
@@ -93,6 +100,34 @@ static void rect_draw(nrf_lcd_t const * p_instance,
     }
 
     p_instance->lcd_rect_draw(x, y, width, height, color);
+}
+
+static void rect_draw_data(nrf_lcd_t const * p_instance,
+                      uint16_t x,
+                      uint16_t y,
+                      uint16_t width,
+                      uint16_t height,
+                      uint8_t *data)
+{
+    uint16_t lcd_width = nrf_gfx_width_get(p_instance);
+    uint16_t lcd_height = nrf_gfx_height_get(p_instance);
+
+    if ((x >= lcd_width) || (y >= lcd_height))
+    {
+        return;
+    }
+
+    if (width > (lcd_width - x))
+    {
+        width = lcd_width - x;
+    }
+
+    if (height > (lcd_height - y))
+    {
+        height = lcd_height - y;
+    }
+
+    p_instance->lcd_rect_draw_data(x, y, width, height, data);
 }
 
 static void line_draw(nrf_lcd_t const * p_instance,
@@ -196,10 +231,12 @@ ret_code_t nrf_gfx_init(nrf_lcd_t const * p_instance)
     ASSERT(p_instance->lcd_uninit != NULL);
     ASSERT(p_instance->lcd_pixel_draw != NULL);
     ASSERT(p_instance->lcd_rect_draw != NULL);
+    ASSERT(p_instance->lcd_rect_draw_data != NULL);
     ASSERT(p_instance->lcd_display != NULL);
     ASSERT(p_instance->lcd_rotation_set != NULL);
     ASSERT(p_instance->lcd_display_invert != NULL);
     ASSERT(p_instance->p_lcd_cb != NULL);
+    ASSERT(p_instance->lcd_clear_screen != NULL);
 
     ret_code_t err_code;
 
@@ -768,5 +805,23 @@ ret_code_t nrf_gfx_bmp666_draw(nrf_lcd_t const * p_instance,
     return NRF_SUCCESS;
 }
 
+ret_code_t nrf_gfx_bmp888_draw(nrf_lcd_t const * p_instance,
+                               nrf_gfx_rect_t const * p_rect,
+                               uint8_t *img_buf)
+{
+    ASSERT(p_instance != NULL);
+    ASSERT(p_instance->p_lcd_cb->state != NRFX_DRV_STATE_UNINITIALIZED);
+    ASSERT(p_rect != NULL);
+    ASSERT(img_buf != NULL);
+
+    if ((p_rect->x > nrf_gfx_width_get(p_instance)) || (p_rect->y > nrf_gfx_height_get(p_instance)))
+    {
+        return NRF_ERROR_INVALID_PARAM;
+    }
+
+    rect_draw_data(p_instance, p_rect->x, p_rect->y, p_rect->width, p_rect->height, img_buf);
+
+    return NRF_SUCCESS;
+}
 #endif //NRF_MODULE_ENABLED(NRF_GFX)
 
