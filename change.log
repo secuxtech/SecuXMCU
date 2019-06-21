@@ -1,43 +1,43 @@
 Version 1.23
-1. Add new coin support: BNB & GRS
-2. Optimize the transaction performance
-3. Optimize some UI representations
-4. Fix bug: Battery charging indication
-5. Fix bug: Reset function of PIN change
+1. Added new coin support: BNB & GRS
+2. Optimized the transaction performance
+3. Optimized some UI representations
+4. Fixed bug: Battery charging indication
+5. Fixed bug: Reset function of PIN change
 
 Version 1.22
-1. Improve transmission performance
-2. Improve the touchscreen user experience
-3. Enhance battery power detection
-4. Optimize display messages
+1. Improved transmission performance
+2. Improved the touchscreen user experience
+3. Enhanced battery power detection
+4. Optimized display messages
 
 Version 1.21
-1. Refine bluetooth wording
-2. Fix bug: account information display messed
+1. Refined Bluetooth wording
+2. Fixed bug: account information display messed
 
 Version 1.20
-1. Optimize the performance of bluetooth and USB
-2. Improve the user experience
-3. Enable feature get account address
+1. Optimized the performance of Bluetooth and USB
+2. Improved the user experience
+3. Enabled feature get account address
 
 Version 1.19
-1. Increace the capacity of QR code
-2. Fix bug: incorrect amount display in XRP
+1. Increased the capacity of QR code
+2. Fixed bug: incorrect amount display in XRP
 
 Version 1.18
-1. Refine system performance
-2. Add new warning messages for low battery and PIN code error
-3. Modify system information content
-4. Fix bug: display incorrect info while deleting account through Bluetooth
+1. Refined system performance
+2. Added new warning messages for low battery and PIN code error
+3. Modified system information content
+4. Fixed bug: display incorrect info while deleting account through Bluetooth
 
 Version 1.17
-1. Refine page button sensing area
-2. Fix bug: bitcoin legacy transaction failed on multiple UTXO
-3. Disable usb auto reset function
-4. Refine upgrading performance
-5. Modify UI
+1. Refined page button sensing area
+2. Fixed bug: bitcoin legacy transaction failed on multiple UTXO
+3. Disabled USB auto reset function
+4. Refined upgrading performance
+5. Modified UI
 
 Version 1.16
-1. Fix bug: usb is not worked on MAC and Linux 
-2. Add feature: modify device system info page - version info
-3. Add feature: refresh account frame in appropriate situation
+1. Fixed bug: USB is not worked on MAC and Linux
+2. Added feature: modify device system info page - version info
+3. Added feature: refresh account frame in appropriate situation
