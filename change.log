@@ -1,3 +1,10 @@
+Version 1.24
+1. Updated new Ripple coin icon.
+2. Fixed bug: prevent occasional information out of sync between the device and the host.
+3. Fixed bug: prevent occasional Bluetooth disconnects on some mobile devices.
+4. Optimized battery charging indication.
+5. Optimized transaction performance.
+
 Version 1.23
 1. Added new coin support: BNB & GRS
 2. Optimized the transaction performance
