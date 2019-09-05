@@ -1,3 +1,14 @@
+Version 1.26
+1. Added Telec certification info
+2. Fixed bug: LTC address display for confirmation
+3. Enabled USB testing function
+4. Fixed some minor bugs
+
+Version 1.25
+1. Added feature: XRP tag function
+2. Edited UI: Account Information page
+3. Fixed bug: hidden wallet feature
+
 Version 1.24
 1. Updated new Ripple coin icon.
 2. Fixed bug: prevent occasional information out of sync between the device and the host.
