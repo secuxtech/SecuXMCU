@@ -1,6 +1,6 @@
-#include"bip39.h"
-#include"bip39_english.h"
-#include<stdlib.h>
+#include "bip39.h"
+#include "bip39_english.h"
+#include <stdlib.h>
 #include "nrf_drv_rng.h"
 #include "nrf_delay.h"
 #include "nrf_crypto_hmac.h"
@@ -10,9 +10,7 @@
 #include "nrf_log.h"
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
-#include "screen_display.h"
 
-extern Frame frame;
 extern char salt_my[];
 extern char my_word[24][10];
 extern uint8_t recovery_method  ;
@@ -25,7 +23,6 @@ uint8_t random_vector_generate(uint8_t * p_buff, uint8_t size)
     nrf_drv_rng_bytes_available(&available);
     uint8_t length = MIN(size, available);
     nrf_drv_rng_rand(p_buff, length);
-
     return length;
 }
 
@@ -78,7 +75,8 @@ void index_to_recovery_word(uint16_t* index, char(* my_word)[10], size_t size){
 	}
 }
 
-
+/*
+TODO: NOSE mode!!!
 void recovery_word_to_mnemonic(size_t size, char* mnemonic){
 	for(int i = 0; i < size; i++){
 		strcat(mnemonic,my_word[i]);
@@ -148,8 +146,10 @@ void generate_seed(unsigned char * seed){
               seed[j] ^= m_digest[j];			
         }
 }
+*/
 
-bool check_if_in_wordlist(char* recovery_word){
+bool check_if_in_wordlist(char* recovery_word)
+{
 	uint16_t temp = 0;
 	while(strcmp(recovery_word, wordlist[temp]) != 0){
 		temp ++;	
@@ -159,49 +159,52 @@ bool check_if_in_wordlist(char* recovery_word){
 	return true;
 }
 
-bool check_if_recovery_word_legal(char(* my_word)[10], uint8_t recovery_method){
+bool check_if_recovery_word_legal(char(* recovery_word)[10], uint8_t recovery_method)
+{
 	uint16_t temp = 0;
 	uint16_t index[24];
 	uint8_t random_buff[33];
-	for(int i = 0;i < recovery_method;i++){
-		while(strcmp(my_word[i], wordlist[temp]) != 0)
-			temp ++;	
+	for (int i = 0; i < recovery_method; i++)
+    {
+		while (strcmp(recovery_word[i], wordlist[temp]) != 0)
+        {
+            temp ++;
+        }
 		index[i] = temp;
 		temp = 0;
-		//NRF_LOG_INFO("%d : %d ", i, index[i]);
 	}
 	NRF_LOG_FLUSH();
 
 	uint8_t remain = 11;
 	uint16_t pos = 0;
 	
-	if (recovery_method == 12) {	// ENT = 128 bits, 16 bytes, CS = 4 bits
-		for (int i = 0; i < 16; i ++) {
-			if (remain >= 8) {
+	if (recovery_method == 12)
+    {	// ENT = 128 bits, 16 bytes, CS = 4 bits
+		for (int i = 0; i < 16; i ++)
+        {
+			if (remain >= 8)
+            {
 				random_buff[i] = index[pos] >> (remain - 8);
-			} else {
+			}
+            else
+            {
 				random_buff[i] = (index[pos] & ((1 << remain) - 1)) << (8 - remain); 
 				remain += 11;
 				random_buff[i] += index[++pos] >> (remain - 8);
 			}	
 			remain -= 8;
 		}			
-	} else if (recovery_method == 18) {  // ENT = 192 bits, 24 bytes, CS = 6 bits
-		for (int i = 0; i < 24; i ++) {
-			if (remain >= 8) {
+	}
+    else if (recovery_method == 18)
+    {  // ENT = 192 bits, 24 bytes, CS = 6 bits
+        for (int i = 0; i < 24; i ++)
+        {
+			if (remain >= 8)
+            {
 				random_buff[i] = index[pos] >> (remain - 8);
-			} else {
-				random_buff[i] = (index[pos] & ((1 << remain) - 1)) << (8 - remain); 
-				remain += 11;
-				random_buff[i] += index[++pos] >> (remain - 8);
-			}	
-			remain -= 8;
-		}	
-	} else if (recovery_method == 24) {  // ENT = 256 bits, 32 bytes, CS = 8 bits
-		for (int i = 0; i < 32; i ++) {
-			if (remain >= 8) {
-				random_buff[i] = index[pos] >> (remain - 8);
-			} else {
+			}
+            else
+            {
 				random_buff[i] = (index[pos] & ((1 << remain) - 1)) << (8 - remain); 
 				remain += 11;
 				random_buff[i] += index[++pos] >> (remain - 8);
@@ -209,23 +212,34 @@ bool check_if_recovery_word_legal(char(* my_word)[10], uint8_t recovery_method){
 			remain -= 8;
 		}	
 	}
-	
-	
-	
-	
-	
-	
+    else if (recovery_method == 24)
+    {  // ENT = 256 bits, 32 bytes, CS = 8 bits
+		for (int i = 0; i < 32; i ++)
+        {
+			if (remain >= 8)
+            {
+				random_buff[i] = index[pos] >> (remain - 8);
+			}
+            else
+            {
+				random_buff[i] = (index[pos] & ((1 << remain) - 1)) << (8 - remain); 
+				remain += 11;
+				random_buff[i] += index[++pos] >> (remain - 8);
+			}	
+			remain -= 8;
+		}	
+	}
+
 	nrf_crypto_hash_context_t   hash_context;
 	nrf_crypto_hash_sha256_digest_t     m_digest;
 	const size_t m_digest_len = NRF_CRYPTO_HASH_SIZE_SHA256;
 	size_t digest_len = m_digest_len;
 	
-	
 	if (recovery_method == 12)
-		nrf_crypto_hash_calculate(&hash_context,                     // Context or NULL to allocate internally
+		nrf_crypto_hash_calculate(&hash_context,                   // Context or NULL to allocate internally
 								&g_nrf_crypto_hash_sha256_info,    // Info structure configures hash mode
 								random_buff,                       // Input buffer
-								16,                     			// Input size
+								16,                     		   // Input size
 								m_digest,                          // Result buffer
 								&digest_len);                      // Result size
 	else if (recovery_method == 18)
