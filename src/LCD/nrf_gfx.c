@@ -611,10 +611,15 @@ ret_code_t nrf_gfx_print(nrf_lcd_t const * p_instance,
 
     for (size_t i = 0; string[i] != '\0' ; i++)
     {
-        if (string[i] == '\n')
+        if (string[i] == '\t')
         {
             x = p_point->x;
-            y += p_font->height + p_font->height / 10;
+            y += p_font->height;
+        }
+        else if (string[i] == '\n')
+        {
+            x = p_point->x;
+            y += p_font->height + p_font->height / 8;
         }
         else
         {

@@ -47,11 +47,9 @@
 #include "sdk_errors.h"
 #include "nrf_sdh_ble.h"
 #include "nrf_sdh_soc.h"
+uint8_t ui_bridge_ble_disconnect(void);	
 
 #define BLE_ADV_MODES (5) /**< Total number of possible advertising modes. */
-
-
-void ble_button_off_event(void);
 
 /**@brief Function for checking if the whitelist is in use.
  *
@@ -146,7 +144,7 @@ static void on_terminated(ble_advertising_t * const p_advertising, ble_evt_t con
     {
         // Start advertising in the next mode.
         ret = ble_advertising_start(p_advertising, adv_mode_next_get(p_advertising->adv_mode_current));
-        ble_button_off_event();					
+        ui_bridge_ble_disconnect();        
 
         if ((ret != NRF_SUCCESS) && (p_advertising->error_handler != NULL))
         {
