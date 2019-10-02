@@ -623,32 +623,31 @@ ret_code_t nrf_gfx_print(nrf_lcd_t const * p_instance,
         }
         else
         {
+   
+            uint8_t char_idx = string[i] - p_font->startChar;
+            uint16_t char_width = (string[i] == ' ') ? 
+                                  (p_font->height / 2) : (p_font->charInfo[char_idx].widthBits+p_font->spacePixels);
+        
+           if ((x+char_width) > (nrf_gfx_width_get(p_instance)))
+            {
+                if (wrap)
+                {
+                    x = p_point->x;
+                    y += p_font->height + p_font->height / 10;
+                }
+                else
+                {
+                    break;
+                }
+                if ((y+p_font->height) > nrf_gfx_height_get(p_instance))
+                {
+                    break;
+                }
+           }
+      
             write_character(p_instance, p_font, (uint8_t)string[i], &x, y, font_color);
         }
-
-        uint8_t char_idx = string[i] - p_font->startChar;
-        uint16_t char_width = string[i] == ' ' ? (p_font->height / 2) :
-                                                p_font->charInfo[char_idx].widthBits;
-
-        if (x > (nrf_gfx_width_get(p_instance) - char_width))
-        {
-            if (wrap)
-            {
-                x = p_point->x;
-                y += p_font->height + p_font->height / 10;
-            }
-            else
-            {
-                break;
-            }
-
-            if (y > (nrf_gfx_height_get(p_instance) - p_font->height))
-            {
-                break;
-            }
-        }
     }
-
     return NRF_SUCCESS;
 }
 
