@@ -346,7 +346,7 @@ uint8_t doge_icon_bitmap[72] =
 	0x1F, 0xFF, 0x00, //    #############        
 };
 
-uint8_t token_dencent_icon_bitmap[72] 
+uint8_t token_dencent_icon_bitmap[72] =
 {
 	0x38, 0x00, 0x00, //   ###                       
 	0x7E, 0x00, 0x00, //  ######                     
