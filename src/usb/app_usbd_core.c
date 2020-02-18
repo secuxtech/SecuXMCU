@@ -100,8 +100,8 @@ NRF_LOG_MODULE_REGISTER();
    .bDeviceSubClass = 0,                               /* device subclass: 0 - specified by interface */ \
    .bDeviceProtocol = 0,                               /* device protocol: 0 - specified by interface */ \
    .bMaxPacketSize0 = NRF_DRV_USBD_EPSIZE,             /* endpoint size: fixed to: NRF_DRV_USBD_EPSIZE*/ \
-   .idVendor = APP_USBD_VID,                           /* Vendor ID*/                                    \
-   .idProduct = APP_USBD_PID,                          /* Product ID*/                                   \
+   .idVendor = 0x1915,                           /* Vendor ID*/                                    \
+   .idProduct = 0x4297,                          /* Product ID*/                                   \
    .bcdDevice = APP_USBD_BCD_VER_MAKE(                 /* Device version BCD */                          \
        APP_USBD_DEVICE_VER_MAJOR,                                                                        \
        APP_USBD_DEVICE_VER_MINOR),                                                                       \

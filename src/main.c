@@ -64,6 +64,8 @@
 
 extern bool option_pin_mode0;
 
+void usb_init();
+
 /**@brief Function for application main entry.
  */
 int main(void)
@@ -87,7 +89,11 @@ int main(void)
     
     NRF_LOG_INFO("Hello USB!");
     NRF_LOG_FLUSH();
+#if (ENABLE_WEBUSB == 1)
     usb21_init();
+#else
+    usb_init();
+#endif
     ikv_spim_init();
     lcm_init();
     crypto_init();

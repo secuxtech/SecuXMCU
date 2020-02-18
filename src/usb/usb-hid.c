@@ -412,20 +412,19 @@ static void hid_generic_mouse_action(hid_generic_mouse_action_t action, int8_t p
 }
 #endif
 
-#define WEBUSB 1
-#if (WEBUSB == 0)
-
+#if (ENABLE_WEBUSB == 0)
+typedef uint32_t (*response_callback_t)(void);
 /**
  * @brief process response and set the IN report to send
  *
  */
-void response_process(uint8_t *response, uint16_t response_size)
+void response_process(uint8_t *response, uint16_t response_size, response_callback_t *callback)
 {
 	ret_code_t ret;
 	
 	static uint8_t report_secux[HID_REPORT_LENGTH] = {0};
 	NRF_LOG_INFO("response_size:%d", response_size);
-	for (int i=0; i<=response_size/HID_REPORT_LENGTH; i++)
+	for (int i=0; i<CEIL_DIV(response_size, HID_REPORT_LENGTH); i++)
 	{
 		memset(report_secux, 0, HID_REPORT_LENGTH);
 		memcpy(report_secux, response + (i*HID_REPORT_LENGTH), HID_REPORT_LENGTH);
@@ -442,6 +441,11 @@ void response_process(uint8_t *response, uint16_t response_size)
 	{
 		NRF_LOG_INFO("%s failed", __FUNCTION__);
 	}
+    
+    if (NULL != *callback)
+    {
+        (*callback)();
+    }
 }
 #endif
 /**
