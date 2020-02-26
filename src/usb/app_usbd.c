@@ -811,7 +811,7 @@ ret_code_t app_usbd_init(app_usbd_config_t const * p_config)
     }
 #endif
 
-#if APP_USBD_CONFIG_POWER_EVENTS_PROCESS
+#if 0 //APP_USBD_CONFIG_POWER_EVENTS_PROCESS
     ret = nrf_drv_power_init(NULL);
     if ((ret != NRF_SUCCESS) && (ret != NRF_ERROR_MODULE_ALREADY_INITIALIZED))
     {
