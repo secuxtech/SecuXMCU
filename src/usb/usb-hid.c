@@ -413,6 +413,27 @@ static void hid_generic_mouse_action(hid_generic_mouse_action_t action, int8_t p
 #endif
 
 #if (ENABLE_WEBUSB == 0)
+static bool hid_generic_process_state(uint8_t *report, uint16_t report_size)
+{
+    if (m_report_pending)
+        return false;
+    if (report != NULL)
+    {
+        ret_code_t ret;
+			
+        ret = app_usbd_hid_generic_in_report_set(
+            &m_app_hid_generic,
+            report,
+            report_size);
+		
+        if (ret == NRF_SUCCESS)
+        {
+            m_report_pending = true;
+        }
+    }
+    return true;
+}
+
 typedef uint32_t (*response_callback_t)(void);
 /**
  * @brief process response and set the IN report to send
@@ -420,7 +441,7 @@ typedef uint32_t (*response_callback_t)(void);
  */
 void response_process(uint8_t *response, uint16_t response_size, response_callback_t *callback)
 {
-	ret_code_t ret;
+	ret_code_t ret = NRF_SUCCESS;
 	
 	static uint8_t report_secux[HID_REPORT_LENGTH] = {0};
 	NRF_LOG_INFO("response_size:%d", response_size);
@@ -428,11 +449,23 @@ void response_process(uint8_t *response, uint16_t response_size, response_callba
 	{
 		memset(report_secux, 0, HID_REPORT_LENGTH);
 		memcpy(report_secux, response + (i*HID_REPORT_LENGTH), HID_REPORT_LENGTH);
-		
+		NRF_LOG_INFO("i:%d", i);
+        NRF_LOG_HEXDUMP_INFO(report_secux, 64);
+        NRF_LOG_FLUSH();
+        bool state = hid_generic_process_state(report_secux, HID_REPORT_LENGTH);
+        
+        if (state == false)
+        {
+            NRF_LOG_INFO("postpone for the hid report, retry next time");
+            i--;
+        }
+        while(app_usbd_event_queue_process()){}
+        /*
 		ret = app_usbd_hid_generic_in_report_set(
 			&m_app_hid_generic,
 			report_secux,
 			HID_REPORT_LENGTH);
+        */
 		
 		nrf_delay_ms(100); //for test
 	}
@@ -492,7 +525,7 @@ static void hid_user_ev_handler(app_usbd_class_inst_t const * p_inst,
         case APP_USBD_HID_USER_EVT_IN_REPORT_DONE:
         {
 					NRF_LOG_INFO("IN_REPORT_DONE, %d: %s", __LINE__, __FUNCTION__);
-            //m_report_pending = false;
+            m_report_pending = false;
             //hid_generic_mouse_process_state();
             //bsp_board_led_invert(LED_HID_REP_IN);
             break;
