@@ -17,7 +17,7 @@
 #include "preloader_cmd_lst.h"
 #include "hmac_sha384.h"
 #include "nrf_delay.h"
-
+#include "device_config.h"
 
 
 

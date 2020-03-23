@@ -61,6 +61,7 @@
 #include "common_service.h"
 #include "fstorage_service.h"
 #include "app_usbd_21.h"
+#include "device_config.h"
 
 extern bool option_pin_mode0;
 
