@@ -61,6 +61,7 @@
 #include "common_service.h"
 #include "fstorage_service.h"
 #include "app_usbd_21.h"
+#include "mem_manager.h"
 #include "device_config.h"
 
 extern bool option_pin_mode0;
@@ -97,7 +98,12 @@ int main(void)
 #endif
     ikv_spim_init();
     lcm_init();
+
+    // init for mbedTLS
+    err_code = nrf_mem_init();
+    APP_ERROR_CHECK(err_code);
     crypto_init();
+
     if(option_pin_mode0 == true)
     {
         saadc_init();
