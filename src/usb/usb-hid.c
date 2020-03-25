@@ -589,7 +589,7 @@ static void usbd_user_ev_handler(app_usbd_event_type_t event)
             break;
         case APP_USBD_EVT_POWER_READY:
             NRF_LOG_INFO("USB ready");
-            app_usbd_start();
+            //app_usbd_start();
             break;
         default:
             break;
