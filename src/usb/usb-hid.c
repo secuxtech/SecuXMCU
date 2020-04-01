@@ -447,19 +447,26 @@ void response_process(uint8_t *response, uint16_t response_size, response_callba
 	NRF_LOG_INFO("response_size:%d", response_size);
 	for (int i=0; i<CEIL_DIV(response_size, HID_REPORT_LENGTH); i++)
 	{
-		memset(report_secux, 0, HID_REPORT_LENGTH);
-		memcpy(report_secux, response + (i*HID_REPORT_LENGTH), HID_REPORT_LENGTH);
-		NRF_LOG_INFO("i:%d", i);
-        NRF_LOG_HEXDUMP_INFO(report_secux, 64);
-        NRF_LOG_FLUSH();
-        bool state = hid_generic_process_state(report_secux, HID_REPORT_LENGTH);
-        
-        if (state == false)
+        if (true == m_report_pending)
         {
             NRF_LOG_INFO("postpone for the hid report, retry next time");
             i--;
+            while(app_usbd_event_queue_process()){}
         }
-        while(app_usbd_event_queue_process()){}
+        else
+        {
+            memset(report_secux, 0, HID_REPORT_LENGTH);
+            memcpy(report_secux, response + (i*HID_REPORT_LENGTH), HID_REPORT_LENGTH);
+            NRF_LOG_INFO("i:%d", i);
+            NRF_LOG_HEXDUMP_INFO(report_secux, 64);
+            NRF_LOG_FLUSH();
+            bool state = hid_generic_process_state(report_secux, HID_REPORT_LENGTH);
+
+            // wait for in report event done
+            while(app_usbd_event_queue_process()){}
+            nrf_delay_ms(3);
+            while(app_usbd_event_queue_process()){}
+        }
         /*
 		ret = app_usbd_hid_generic_in_report_set(
 			&m_app_hid_generic,
@@ -467,7 +474,7 @@ void response_process(uint8_t *response, uint16_t response_size, response_callba
 			HID_REPORT_LENGTH);
         */
 		
-		nrf_delay_ms(100); //for test
+		//nrf_delay_ms(100); //for test
 	}
 	
 	if (ret != NRF_SUCCESS)
