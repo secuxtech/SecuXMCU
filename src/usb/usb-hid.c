@@ -501,37 +501,37 @@ static void hid_user_ev_handler(app_usbd_class_inst_t const * p_inst,
     {
         case APP_USBD_HID_USER_EVT_OUT_REPORT_READY:
         {
-					NRF_LOG_INFO("OUT_REPORT_READY, %d: %s", __LINE__, __FUNCTION__);
-						uint8_t const * p_rep_buffer = NULL;
-						size_t buffer_size = 0;
-					  p_rep_buffer = app_usbd_hid_generic_out_report_get(&m_app_hid_generic, &buffer_size);
-						/* 
-						// print out buffer
-						NRF_LOG_INFO("print buffer, size:%d", buffer_size);
-						for (int i=0; i<buffer_size; i+=4)
-						{
-							NRF_LOG_INFO("buffer[%d]:%.02x %.02x %.02x %.02x", i, 
-								p_rep_buffer[i], p_rep_buffer[i+1], p_rep_buffer[i+2], p_rep_buffer[i+3]);
-						}
+            NRF_LOG_INFO("OUT_REPORT_READY, %d: %s", __LINE__, __FUNCTION__);
+            uint8_t const * p_rep_buffer = NULL;
+            size_t buffer_size = 0;
+            p_rep_buffer = app_usbd_hid_generic_out_report_get(&m_app_hid_generic, &buffer_size);
+            /*
+            // print out buffer
+            NRF_LOG_INFO("print buffer, size:%d", buffer_size);
+            for (int i=0; i<buffer_size; i+=4)
+            {
+                NRF_LOG_INFO("buffer[%d]:%.02x %.02x %.02x %.02x", i, 
+                    p_rep_buffer[i], p_rep_buffer[i+1], p_rep_buffer[i+2], p_rep_buffer[i+3]);
+            }
             */
-						if (g_apdu_command_received == APDU_COMMAND_QUEUE_SIZE)
-						{
-							NRF_LOG_INFO("received command over buffer size");
-							break;
-						}
-						else
-						{
-							//NRF_LOG_INFO("test123, %d" , __LINE__);
-							memcpy(g_apdu_command_buffer[g_apdu_command_received++], p_rep_buffer, buffer_size);
-							NRF_LOG_INFO("received command: index:%d", g_apdu_command_received-1);
-							NRF_LOG_HEXDUMP_INFO(&g_apdu_command_buffer[g_apdu_command_received - 1], buffer_size);
-						}
-						
+            if (g_apdu_command_received == APDU_COMMAND_QUEUE_SIZE)
+            {
+                NRF_LOG_INFO("received command over buffer size");
+                break;
+            }
+            else
+            {
+                //NRF_LOG_INFO("test123, %d" , __LINE__);
+                memcpy(g_apdu_command_buffer[g_apdu_command_received++], p_rep_buffer, buffer_size);
+                NRF_LOG_INFO("HID received command: index:%d", g_apdu_command_received-1);
+                // NRF_LOG_HEXDUMP_INFO(&g_apdu_command_buffer[g_apdu_command_received - 1], buffer_size);
+            }
+
             break;
         }
         case APP_USBD_HID_USER_EVT_IN_REPORT_DONE:
         {
-					NRF_LOG_INFO("IN_REPORT_DONE, %d: %s", __LINE__, __FUNCTION__);
+            NRF_LOG_INFO("IN_REPORT_DONE, %d: %s", __LINE__, __FUNCTION__);
             m_report_pending = false;
             //hid_generic_mouse_process_state();
             //bsp_board_led_invert(LED_HID_REP_IN);
