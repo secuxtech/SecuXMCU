@@ -657,7 +657,8 @@ ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
                                      uint32_t font_color,
                                      const char * string,
                                      const nrf_gfx_font_desc_t * p_font,
-                                     bool wrap)
+                                     bool wrap,
+                                     int page)
 {
     ASSERT(p_instance != NULL);
     ASSERT(p_instance->p_lcd_cb->state != NRFX_DRV_STATE_UNINITIALIZED);
@@ -688,7 +689,8 @@ ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
         // Not enough space to write even single char.
         return NRF_ERROR_INVALID_PARAM;
     }
-
+    
+    int _page = 1;
     for (size_t i = 0; string[i] != '\0' ; i++)
     {
         if (string[i] == '\t')
@@ -700,7 +702,7 @@ ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
         else if (string[i] == '\n')
         {
             x = p_point->x;
-            y += p_font->height + p_font->height / 8;
+            y += p_font->height + p_font->height / 10;
             is_word_checking = true;
         }
         else
@@ -761,10 +763,17 @@ ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
                 {
                     break;
                 }
-
-                if ((y + p_font->height) > bottom_boundary)
-                {
+            }
+            
+            if ((y + p_font->height) > bottom_boundary)
+            {
+                if (page <= _page)
                     break;
+                else
+                {
+                    _page++;
+                    x = p_point->x;
+                    y = p_point->y;
                 }
             }
 
@@ -774,7 +783,10 @@ ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
                 // skip ' ' in the first char
             }
             else
-                write_character(p_instance, p_font, (uint8_t)string[i], &x, y, font_color);
+            {
+                if (page == _page)
+                    write_character(p_instance, p_font, (uint8_t)string[i], &x, y, font_color);
+            }
         }
     }
     return NRF_SUCCESS;

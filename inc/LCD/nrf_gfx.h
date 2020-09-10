@@ -309,6 +309,7 @@ ret_code_t nrf_gfx_print(nrf_lcd_t const * p_instance,
  * @param[in] p_string              Pointer to the string.
  * @param[in] p_font                Pointer to the font descriptor.
  * @param[in] wrap                  If true, the string will be wrapped to the new line.
+ * @param[in] page                  For display, indicate the page of string.
  */
 ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
                                      nrf_gfx_point_t const * p_point,
@@ -317,7 +318,8 @@ ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
                                      uint32_t font_color,
                                      const char * string,
                                      const nrf_gfx_font_desc_t * p_font,
-                                     bool wrap);
+                                     bool wrap,
+                                     int page);
 /**
  * @brief Function for getting the height of the screen.
  *
