@@ -786,6 +786,8 @@ ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
             {
                 if (page == _page)
                     write_character(p_instance, p_font, (uint8_t)string[i], &x, y, font_color);
+                else
+                    x += char_width;
             }
         }
     }
