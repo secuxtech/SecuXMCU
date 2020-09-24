@@ -299,6 +299,28 @@ ret_code_t nrf_gfx_print(nrf_lcd_t const * p_instance,
                          bool wrap);
 
 /**
+ * @brief Function for printing a string to the screen.
+ *
+ * @param[in] p_instance            Pointer to the LCD instance.
+ * @param[in] p_point               Pointer to the point where to start drawing the object.
+ * @param[in] width                 The width of the drawing region.
+ * @param[in] height                The height of the drawing region.
+ * @param[in] font_color            Color of the font in the display accepted format.
+ * @param[in] p_string              Pointer to the string.
+ * @param[in] p_font                Pointer to the font descriptor.
+ * @param[in] wrap                  If true, the string will be wrapped to the new line.
+ * @param[in] page                  For display, indicate the page of string.
+ */
+ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
+                                     nrf_gfx_point_t const * p_point,
+                                     uint16_t width,
+                                     uint16_t height,
+                                     uint32_t font_color,
+                                     const char * string,
+                                     const nrf_gfx_font_desc_t * p_font,
+                                     bool wrap,
+                                     int page);
+/**
  * @brief Function for getting the height of the screen.
  *
  * @param[in] p_instance            Pointer to the LCD instance.
