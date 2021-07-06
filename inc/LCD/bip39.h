@@ -17,7 +17,9 @@ void recovery_word_to_mnemonic(size_t size, char* mnemonic);
 //get words & seed
 void generate_seed(unsigned char * seed);
 
-bool check_if_in_wordlist(char* recovery_word);
-
 bool check_if_recovery_word_legal(char(* my_word)[10], uint8_t recovery_method);
+
+const char *find_word_by_index(int index);
+int find_index_by_word(const char *the_word, bool partial);
+
 #endif
