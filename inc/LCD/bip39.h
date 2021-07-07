@@ -19,6 +19,8 @@ void generate_seed(unsigned char * seed);
 
 bool check_if_recovery_word_legal(char(* my_word)[10], uint8_t recovery_method);
 
+void bip39_init(void);
+
 const char *find_word_by_index(int index);
 int find_index_by_word(const char *the_word, bool partial);
 
