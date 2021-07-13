@@ -75,7 +75,7 @@ const char *find_word_by_index(int index)
 int find_index_by_word(const char *the_word, bool partial)
 {
 	int len = strlen(the_word);
-	if ((len < 0) || (len > 9)) return -1;	// Illegal word.
+	if ((len <= 0) || (len > 9)) return -1;	// Illegal word.
 
 	char leading_ch = *the_word;
 	int tbl_idx = leading_ch - 'a';
