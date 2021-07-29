@@ -62,6 +62,7 @@
 #include "common_service.h"
 #include "fstorage_service.h"
 #include "app_usbd_21.h"
+#include "bip39.h"
 
 extern bool option_pin_mode0;
 
@@ -95,6 +96,8 @@ int main(void)
     nrf_mem_init();
     
     crypto_init();
+    bip39_init();
+
     if(option_pin_mode0 == true)
     {
         saadc_init();

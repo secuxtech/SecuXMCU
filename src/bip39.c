@@ -12,10 +12,98 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
+//-----------Shrink BIP39 --------------------------
+extern const char *worddict;
+typedef struct
+{
+	int word_index;
+	const char *first_word;
+} alpha_word_t;
+
+alpha_word_t word_alpha_table[26] = {{0,NULL}};	// Only 25 entries due to no 'x' word.
+
+void bip39_init(void)
+{
+//--- Initial word_alpha_table[]
+	char lead_ch = 'a';
+	const char *p_word = worddict;
+	int w_index = 0;
+	int table_index = 0;
+	memset(word_alpha_table, 0, sizeof(word_alpha_table)); // Clear all pointers to NULL
+	do
+	{
+		word_alpha_table[table_index].first_word = p_word;
+		word_alpha_table[table_index].word_index = w_index;
+
+		if (lead_ch == 'z') break;
+
+		//--- Skip to next different leading word.
+		while ((*p_word) == lead_ch)
+		{
+			p_word += (strlen(p_word) + 1);
+			++w_index;
+		} 
+		++table_index;
+		lead_ch = *p_word;
+	} while(1);
+}
+
+const char *find_word_by_index(int index)
+{
+	const char *p_word = NULL;
+	if (index >= 0)
+	{
+		for(int ii = 0; ii < 25; ++ii)
+		{
+			if(index<word_alpha_table[ii].word_index)	// Found the block after the hit block ?
+			{
+				int table_index = ii-1;
+				int w_index = word_alpha_table[table_index].word_index;
+				p_word = word_alpha_table[table_index].first_word;
+				while(w_index<index)
+				{
+					p_word += (strlen(p_word) + 1);
+					++w_index;
+				} 
+				break;	// Exit for loop.
+			}
+		}
+	}
+	return(p_word);
+}
+
+int find_index_by_word(const char *the_word, bool partial)
+{
+	int len = strlen(the_word);
+	if ((len <= 0) || (len > 9)) return -1;	// Illegal word.
+
+	char leading_ch = *the_word;
+	int tbl_idx = leading_ch - 'a';
+	if (leading_ch >= 'x') --tbl_idx;	// Reorder the index for the word behind 'x'
+
+	const char *p_word = word_alpha_table[tbl_idx].first_word;
+	int w_index = word_alpha_table[tbl_idx].word_index;
+	int found_idx = -1;
+
+	size_t cmp_size = partial ? strlen(the_word) : 10;
+
+	while(*p_word == leading_ch)	// Still in the same leading block ?
+	{
+		if(strncmp(p_word, the_word, cmp_size) == 0)	// Found ?
+		{
+			found_idx = w_index;
+			break;
+		}
+		p_word += (strlen(p_word)+1);
+		++w_index;
+	}
+	return(found_idx);
+}
+//--------------------------------------------------
+
 extern char salt_my[];
 extern char my_word[24][10];
 extern uint8_t recovery_method  ;
-static nrf_crypto_hmac_context_t m_context;
 
 uint8_t random_vector_generate(uint8_t * p_buff, uint8_t size)
 {
@@ -76,7 +164,8 @@ void byte_to_11bit(uint8_t * p_input, uint8_t input_size, uint16_t * p_output, u
 
 void index_to_recovery_word(uint16_t* index, char(* my_word)[10], size_t size){
 	for(int i = 0; i < size; i++){
-		strcpy(my_word[i], wordlist[index[i]]);
+		const char *p_word = find_word_by_index(index[i]);
+		strcpy(my_word[i], p_word);
 	}
 }
 
@@ -91,6 +180,7 @@ void recovery_word_to_mnemonic(size_t size, char* mnemonic){
 	}
 }
 
+static nrf_crypto_hmac_context_t m_context;
 
 void generate_seed(unsigned char * seed){
 	
@@ -153,30 +243,19 @@ void generate_seed(unsigned char * seed){
 }
 */
 
-bool check_if_in_wordlist(char* recovery_word)
-{
-	uint16_t temp = 0;
-	while(strcmp(recovery_word, wordlist[temp]) != 0){
-		temp ++;	
-		if(temp == 2048)
-			return false;
-	}
-	return true;
-}
 
 bool check_if_recovery_word_legal(char(* recovery_word)[10], uint8_t recovery_method)
 {
-	uint16_t temp = 0;
 	uint16_t index[24];
 	uint8_t random_buff[33];
 	for (int i = 0; i < recovery_method; i++)
     {
-		while (strcmp(recovery_word[i], wordlist[temp]) != 0)
-        {
-            temp ++;
-        }
-		index[i] = temp;
-		temp = 0;
+		int found_idx = find_index_by_word(recovery_word[i], false);
+
+		if (found_idx >= 0)
+			index[i] = found_idx;
+		else 
+			index[i] = 0;
 	}
 	NRF_LOG_FLUSH();
 
