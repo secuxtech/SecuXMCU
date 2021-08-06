@@ -55,7 +55,7 @@ const char *find_word_by_index(int index)
 	{
 		for(int ii = 24; ii >= 0; --ii)
 		{
-			if(index > word_alpha_table[ii].word_index)	// Found the block after the hit block ?
+			if(index >= word_alpha_table[ii].word_index)	// Found the block after the hit block ?
 			{
 				int table_index = ii;
 				int w_index = word_alpha_table[table_index].word_index;
