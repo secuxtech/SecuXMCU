@@ -51,16 +51,16 @@ void bip39_init(void)
 const char *find_word_by_index(int index)
 {
 	const char *p_word = NULL;
-	if (index >= 0)
+	if (index >= 0 && index < 2048)
 	{
-		for(int ii = 0; ii < 25; ++ii)
+		for(int ii = 24; ii >= 0; --ii)
 		{
-			if(index<word_alpha_table[ii].word_index)	// Found the block after the hit block ?
+			if(index >= word_alpha_table[ii].word_index)	// Found the block after the hit block ?
 			{
-				int table_index = ii-1;
+				int table_index = ii;
 				int w_index = word_alpha_table[table_index].word_index;
 				p_word = word_alpha_table[table_index].first_word;
-				while(w_index<index)
+				while(w_index < index)
 				{
 					p_word += (strlen(p_word) + 1);
 					++w_index;
