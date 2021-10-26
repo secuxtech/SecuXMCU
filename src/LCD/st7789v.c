@@ -165,8 +165,8 @@
 //#define RGB2BGR(x)      (x << 11) | (x & 0x07E0) | (x >> 11)  //5-6-5 RGB
 #define RGB2BGR(x)      (x << 16) | (x & 0xFC00) | (x >> 16)  //8(6)-8(6)-8(6) RGB
 
-static const nrf_drv_spi_t spi = NRF_DRV_SPI_INSTANCE(ST7789_SPI_INSTANCE);  /**< SPI instance. */
-//static const nrfx_spim_t spi = NRFX_SPIM_INSTANCE(ST7789_SPI_INSTANCE);  /**< SPIM instance. */
+//static const nrf_drv_spi_t spi = NRF_DRV_SPI_INSTANCE(ST7789_SPI_INSTANCE);  /**< SPI instance. */
+static const nrfx_spim_t spi = NRFX_SPIM_INSTANCE(3);  /**< SPIM instance. */
 
 
 
@@ -192,17 +192,17 @@ static st7789_t m_st7789;
 
 static inline void spi_write(const void * data, size_t size)
 {
-    nrf_drv_spi_transfer(&spi, data, size, NULL, 0);
+    //nrf_drv_spi_transfer(&spi, data, size, NULL, 0);
 	
-	  //SPIM
-		/*nrfx_spim_xfer_desc_t const spim_xfer_desc =
-        {
-            .p_tx_buffer = data,
-            .tx_length   = size,
-            .p_rx_buffer = NULL,
-            .rx_length   = 0,
-        };
-    nrfx_spim_xfer(&spi, &spim_xfer_desc, 0);*/
+	//SPIM
+	nrfx_spim_xfer_desc_t const spim_xfer_desc =
+    {
+        .p_tx_buffer = data,
+        .tx_length   = size,
+        .p_rx_buffer = NULL,
+        .rx_length   = 0,
+    };
+    nrfx_spim_xfer(&spi, &spim_xfer_desc, 0);
 	
 }
 
@@ -241,108 +241,117 @@ static void command_list(void)
 {
     //write_command(ST7789_SWRESET);
     //nrf_delay_ms(10);
-	  nrf_gpio_pin_set(ST7789_LCD_RESET);
-		nrf_delay_ms(1);
-		nrf_gpio_pin_clear(ST7789_LCD_RESET);
-		nrf_delay_ms(10);
-		nrf_gpio_pin_set(ST7789_LCD_RESET);
-		nrf_delay_ms(120);
-	
-		
-	
+    nrf_gpio_pin_set(ST7789_LCD_RESET);
+    nrf_delay_ms(1);
+    nrf_gpio_pin_clear(ST7789_LCD_RESET);
+    nrf_delay_ms(10);
+    nrf_gpio_pin_set(ST7789_LCD_RESET);
+    nrf_delay_ms(120);
+
+
+
     write_command(ST7789_SLPOUT);
     nrf_delay_ms(120);
 
-	
-		/*write_command(0x35);
-		write_data(0x01);*/
-		
-		
-		//-------------------------------display and color format setting------------------------------//
-		write_command(ST7789_MADCTL);     // if MV = 1, set this to 0x60
-		write_data(0x60);
-		write_command(0x3a);
-		write_data(0x06);
-		//-------------------------------- Frame rate setting------------------------------------------//
-		write_command(0xb2);
-		write_data(0x0c);
-		write_data(0x0c);
-		write_data(0x00);
-		write_data(0x33);
-		write_data(0x33);
-		write_command(0xb7);
-		write_data(0x35);
-		//---------------------------------ST7789 Power setting--------------------------------------//
+
+    /*write_command(0x35);
+    write_data(0x01);*/
+
+
+    //-------------------------------display and color format setting------------------------------//
+    write_command(ST7789_MADCTL);     // if MV = 1, set this to 0x60
+    write_data(0x60);
+    write_command(0x3a);
+    write_data(0x06);
+    //-------------------------------- Frame rate setting------------------------------------------//
+    write_command(0xb2);
+    write_data(0x0c);
+    write_data(0x0c);
+    write_data(0x00);
+    write_data(0x33);
+    write_data(0x33);
+    write_command(0xb7);
+    write_data(0x35);
+    //---------------------------------ST7789 Power setting--------------------------------------//
     write_command(0xbb);
     write_data(0x1f);
     write_command(0xc0);
-		write_data(0x2c);
-		write_command(0xc2);
-		write_data(0x01);
-		write_command(0xc3);
-		write_data(0x11);
-		write_command(0xc4);
-  	write_data(0x20);
-		write_command(0xc6);
-		write_data(0x05);
-		write_command(0xd0);
-		write_data(0xa4);
-		write_data(0xa1);
-  	//--------------------------------ST7789V gamma setting---------------------------------------//
-		write_command(0xe0);
-		write_data(0xd0);
-		write_data(0x00);
-		write_data(0x14);
-		write_data(0x15);
-		write_data(0x13);
-		write_data(0x2c);
-		write_data(0x42);
-		write_data(0x43);
-		write_data(0x4e);
-		write_data(0x09);
-		write_data(0x16);
-		write_data(0x14);
-		write_data(0x18);
-		write_data(0x21);
-		write_command(0xe1);
-		write_data(0xd0);
-		write_data(0x00);
-		write_data(0x14);
-		write_data(0x15);
-		write_data(0x13);
-		write_data(0x0b);
-		write_data(0x43);
-		write_data(0x55);
-		write_data(0x53);
-		write_data(0x0c);
-		write_data(0x17);
-		write_data(0x14);
-		write_data(0x23);
-		write_data(0x20);
-		
-		
-		write_command(ST7789_CASET);	
-		write_data(0x00);
-		write_data(0x00);
-		write_data(0x01);
-		write_data(0x3F);
+    write_data(0x2c);
+    write_command(0xc2);
+    write_data(0x01);
+    write_command(0xc3);
+    write_data(0x11);
+    write_command(0xc4);
+    write_data(0x20);
+    write_command(0xc6);
+    write_data(0x05);
+    write_command(0xd0);
+    write_data(0xa4);
+    write_data(0xa1);
+    //--------------------------------ST7789V gamma setting---------------------------------------//
+    
+    #define GAMMA_22 0x01
+    #define GAMMA_18 0x02
+    #define GAMMA_25 0x04
+    #define GAMMA_10 0x08
+    
+    write_command(ST7789_GAMSET);
+    write_data(GAMMA_22);
+    
+    //write_command(ST7789_PVGAMCTRL);
+    //write_data(0x0D);
+    //write_data(0x0F);
+    //write_data(0x12);
+    //write_data(0x08);
+    //write_data(0x06);
+    //write_data(0x03);
+    //write_data(0x2A);
+    //write_data(0x33);
+    //write_data(0x42);
+    //write_data(0x29);
+    //write_data(0x18);
+    //write_data(0x16);
+    //write_data(0x27);
+    //write_data(0x29);
+    //
+    //write_command(ST7789_NVGAMCTRL);
+    //write_data(0x0D);
+    //write_data(0x0F);
+    //write_data(0x11);
+    //write_data(0x07);
+    //write_data(0x05);
+    //write_data(0x02);
+    //write_data(0x2A);
+    //write_data(0x32);
+    //write_data(0x42);
+    //write_data(0x2C);
+    //write_data(0x1C);
+    //write_data(0x1B);
+    //write_data(0x29);
+    //write_data(0x29);
 
-		write_command(ST7789_RASET);		
-		write_data(0x00);
-		write_data(0x00);
-		write_data(0x00);
-		write_data(0xEF);
-		
-		//write_command(ST7789_INVON);		// for untouched panel
 
-	
-		write_command(0x29);
-		write_command(0x2c);
+    write_command(ST7789_CASET);	
+    write_data(0x00);
+    write_data(0x00);
+    write_data(0x01);
+    write_data(0x3F);
+
+    write_command(ST7789_RASET);		
+    write_data(0x00);
+    write_data(0x00);
+    write_data(0x00);
+    write_data(0xEF);
+
+    //write_command(ST7789_INVON);		// for untouched panel
+
+
+    write_command(0x29);
+    write_command(0x2c);
    
 }
 
-		// Original table 
-		
+// Original table 
 void ST7789VPanelTurnOnDisplay(void)
 {
 		write_command(0x29);
@@ -388,10 +397,10 @@ static ret_code_t hardware_init(void)
     ret_code_t err_code;
 
     nrf_gpio_cfg_output(ST7789_DC_PIN);
-		nrf_gpio_cfg_output(ST7789_LCD_RESET);
+	nrf_gpio_cfg_output(ST7789_LCD_RESET);
 	
-    nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
-		//nrfx_spim_config_t spi_config = NRFX_SPIM_DEFAULT_CONFIG;
+    //nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
+	nrfx_spim_config_t spi_config = NRFX_SPIM_DEFAULT_CONFIG;
 	
 
     spi_config.sck_pin  = ST7789_SCK_PIN;
@@ -399,8 +408,9 @@ static ret_code_t hardware_init(void)
     spi_config.mosi_pin = ST7789_MOSI_PIN;
     spi_config.ss_pin   = ST7789_SS_PIN;
 
-    err_code = nrf_drv_spi_init(&spi, &spi_config, NULL, NULL);
-		//err_code = nrfx_spim_init(&spi, &spi_config, NULL, NULL); //SPIM
+    //err_code = nrf_drv_spi_init(&spi, &spi_config, NULL, NULL);
+	err_code = nrfx_spim_init(&spi, &spi_config, NULL, NULL); //SPIM
+    
     return err_code;
 }
 
@@ -423,8 +433,8 @@ static ret_code_t st7789_init(void)
 
 static void st7789_uninit(void)
 {
-    nrf_drv_spi_uninit(&spi);
-		//nrfx_spim_uninit(&spi);  //SPIM
+    //nrf_drv_spi_uninit(&spi);
+	nrfx_spim_uninit(&spi);  //SPIM
 }
 
 //static void st7789_pixel_draw(uint16_t x, uint16_t y, uint32_t color)
@@ -478,17 +488,20 @@ static void st7789_rect_draw(uint16_t x, uint16_t y, uint16_t width, uint16_t he
 					data[len++]=b_color;
 				}
 		}
+        
 		t_80=width/SPI_TX_PIXELS_LIMIT;
 		m_80=width%SPI_TX_PIXELS_LIMIT;
 		for (i=0;i<height;i++) {
 			if (t_80>0) {
 				for (j=0;j<t_80;j++) {
-					nrf_drv_spi_transfer(&spi, data, SPI_TX_BYTES_LIMIT, NULL, 0);
+					//nrf_drv_spi_transfer(&spi, data, SPI_TX_BYTES_LIMIT, NULL, 0);
+                    spi_write(data, SPI_TX_BYTES_LIMIT);
 				}
 			}
 			if (m_80>0) {
 				j=m_80*3;
-				nrf_drv_spi_transfer(&spi, data, j, NULL, 0);
+				//nrf_drv_spi_transfer(&spi, data, j, NULL, 0);
+                spi_write(data, j);
 			}
 		}
 
@@ -537,7 +550,8 @@ static void st7789_rect_draw_data(uint16_t x, uint16_t y, uint16_t width, uint16
     {
         size = i + SPI_TX_PIXELS_LIMIT < width*height ? SPI_TX_PIXELS_LIMIT : width*height - i;
         memcpy(_data, data + bytes, size * 3);
-        nrf_drv_spi_transfer(&spi, _data, size * 3, NULL, 0);
+        //nrf_drv_spi_transfer(&spi, _data, size * 3, NULL, 0);
+        spi_write(_data, size * 3);
         bytes += size * 3;
         i += size;
     }
@@ -615,15 +629,13 @@ void st7789_clear_screen(uint16_t width,uint16_t height)
 		for (uint16_t i=0;i<height;i++)
 		{
 			for (uint16_t j=0;j<4;j++) {
-				nrf_drv_spi_transfer(&spi, data, 240, NULL, 0);
+				//nrf_drv_spi_transfer(&spi, data, 240, NULL, 0);
+                spi_write(data,240);
 			}
 		}
 /*lint -restore */
     nrf_gpio_pin_clear(ST7789_DC_PIN);
 }
-
-
-
 
 static lcd_cb_t st7789_cb = {
     .height = ST7789_HEIGHT,
