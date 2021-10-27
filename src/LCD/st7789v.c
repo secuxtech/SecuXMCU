@@ -49,6 +49,7 @@
 #include "nrf_gpio.h"
 #include "boards.h"
 
+extern uint8_t option_pin_mode1;
 // Set of commands described in ST7789 data sheet.
 
 //SYSTEM FUNCTION COMMAND TABLE 1
@@ -384,8 +385,11 @@ static ret_code_t hardware_init(void)
 	nrf_gpio_cfg_output(ST7789_LCD_RESET);
 	
 	nrfx_spim_config_t spi_config = NRFX_SPIM_DEFAULT_CONFIG;
-	
 
+    if (option_pin_mode1 == 1) // st7789 v1
+        spi_config.frequency = NRF_SPIM_FREQ_8M;
+    else
+        spi_config.frequency = NRF_SPIM_FREQ_32M;
     spi_config.sck_pin  = ST7789_SCK_PIN;
     spi_config.miso_pin = ST7789_MISO_PIN;
     spi_config.mosi_pin = ST7789_MOSI_PIN;
