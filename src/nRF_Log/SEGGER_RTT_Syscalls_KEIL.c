@@ -80,7 +80,7 @@ Revision: $Rev: 4351 $
 **********************************************************************
 */
 #if defined(NRF_LOG_ENABLED) && NRF_LOG_ENABLED == 1
-  #pragma import(__use_no_semihosting)
+  //#pragma import(__use_no_semihosting)
 #endif
 
 #ifdef _MICROLIB

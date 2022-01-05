@@ -61,6 +61,7 @@
 #include "mem_manager.h"
 #include "common_service.h"
 #include "fstorage_service.h"
+#include "crypto_service.h"
 #include "app_usbd_21.h"
 #include "bip39.h"
 
@@ -97,6 +98,7 @@ int main(void)
     
     crypto_init();
     bip39_init();
+    zkp_context_init();
 
     if(option_pin_mode0 == true)
     {
