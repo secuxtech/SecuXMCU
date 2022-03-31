@@ -248,6 +248,8 @@ bool check_if_recovery_word_legal(char(* recovery_word)[10], uint8_t recovery_me
 {
 	uint16_t index[24];
 	uint8_t random_buff[33];
+	
+	//	verify each word in the word list
 	for (int i = 0; i < recovery_method; i++)
     {
 		int found_idx = find_index_by_word(recovery_word[i], false);
@@ -257,107 +259,89 @@ bool check_if_recovery_word_legal(char(* recovery_word)[10], uint8_t recovery_me
 		else 
 			index[i] = 0;
 	}
-	NRF_LOG_FLUSH();
 
 	uint8_t remain = 11;
 	uint16_t pos = 0;
-	
-	if (recovery_method == 12)
-    {	// ENT = 128 bits, 16 bytes, CS = 4 bits
-		for (int i = 0; i < 16; i ++)
-        {
-			if (remain >= 8)
-            {
-				random_buff[i] = index[pos] >> (remain - 8);
-			}
-            else
-            {
-				random_buff[i] = (index[pos] & ((1 << remain) - 1)) << (8 - remain); 
-				remain += 11;
-				random_buff[i] += index[++pos] >> (remain - 8);
-			}	
-			remain -= 8;
-		}			
-	}
-    else if (recovery_method == 18)
-    {  // ENT = 192 bits, 24 bytes, CS = 6 bits
-        for (int i = 0; i < 24; i ++)
-        {
-			if (remain >= 8)
-            {
-				random_buff[i] = index[pos] >> (remain - 8);
-			}
-            else
-            {
-				random_buff[i] = (index[pos] & ((1 << remain) - 1)) << (8 - remain); 
-				remain += 11;
-				random_buff[i] += index[++pos] >> (remain - 8);
-			}	
-			remain -= 8;
-		}	
-	}
-    else if (recovery_method == 24)
-    {  // ENT = 256 bits, 32 bytes, CS = 8 bits
-		for (int i = 0; i < 32; i ++)
-        {
-			if (remain >= 8)
-            {
-				random_buff[i] = index[pos] >> (remain - 8);
-			}
-            else
-            {
-				random_buff[i] = (index[pos] & ((1 << remain) - 1)) << (8 - remain); 
-				remain += 11;
-				random_buff[i] += index[++pos] >> (remain - 8);
-			}	
-			remain -= 8;
-		}	
+	int bytes = 0;
+	uint8_t mask = 0;
+	uint8_t offset = 0;
+
+	switch (recovery_method)
+	{
+		case 12: // ENT = 128 bits, 16 bytes, CS = 4 bits
+		{
+			bytes = 16;
+			mask = 0x0F;
+			offset = 4;
+		}
+		break;
+		case 15: // ENT = 160 bits, 20 bytes, CS = 5 bits
+		{
+			bytes = 20;
+			mask = 0x1F;
+			offset = 3;
+		}
+		break;
+		case 18: // ENT = 192 bits, 24 bytes, CS = 6 bits
+		{
+			bytes = 24;
+			mask = 0x3F;
+			offset = 2;
+		}
+		break;
+		case 21: // ENT = 224 bits, 28 bytes, CS = 7 bits
+		{
+			bytes = 28;
+			mask = 0x7F;
+			offset = 1;
+		}
+		break;
+		case 24: // ENT = 256 bits, 32 bytes, CS = 8 bits
+		{
+			bytes = 32;
+			mask = 0xFF;
+			offset = 0;
+		}
+		break;
+		default:
+			NRF_LOG_INFO("invalid recovery method:%d", recovery_method);
+			return false;
 	}
 
+	// index transfer
+	for (int i = 0; i < bytes; i ++)
+	{
+		if (remain >= 8)
+		{
+			random_buff[i] = index[pos] >> (remain - 8);
+		}
+		else
+		{
+			random_buff[i] = (index[pos] & ((1 << remain) - 1)) << (8 - remain); 
+			remain += 11;
+			random_buff[i] += index[++pos] >> (remain - 8);
+		}	
+		remain -= 8;
+	}
+
+	// checksum calc
 	nrf_crypto_hash_context_t   hash_context;
 	nrf_crypto_hash_sha256_digest_t     m_digest;
 	const size_t m_digest_len = NRF_CRYPTO_HASH_SIZE_SHA256;
 	size_t digest_len = m_digest_len;
 	
-	if (recovery_method == 12)
-		nrf_crypto_hash_calculate(&hash_context,                   // Context or NULL to allocate internally
-								&g_nrf_crypto_hash_sha256_info,    // Info structure configures hash mode
-								random_buff,                       // Input buffer
-								16,                     		   // Input size
-								m_digest,                          // Result buffer
-								&digest_len);                      // Result size
-	else if (recovery_method == 18)
-		nrf_crypto_hash_calculate(&hash_context,                     // Context or NULL to allocate internally
-								&g_nrf_crypto_hash_sha256_info,    // Info structure configures hash mode
-								random_buff,                       // Input buffer
-								24,                     			// Input size
-								m_digest,                          // Result buffer
-								&digest_len);                      // Result size
-	else if (recovery_method == 24)
-		nrf_crypto_hash_calculate(&hash_context,                     // Context or NULL to allocate internally
-								&g_nrf_crypto_hash_sha256_info,    // Info structure configures hash mode
-								random_buff,                       // Input buffer
-								32,                     			// Input size
-								m_digest,                          // Result buffer
-								&digest_len);                      // Result size
+	nrf_crypto_hash_calculate(&hash_context,                   // Context or NULL to allocate internally
+							&g_nrf_crypto_hash_sha256_info,    // Info structure configures hash mode
+							random_buff,                       // Input buffer
+							bytes,                     		   // Input size
+							m_digest,                          // Result buffer
+							&digest_len);                      // Result size
 	
-	if(recovery_method == 12){
-		if((index[recovery_method - 1]& 0x0f) == (m_digest[0] >> 4))
-			return true;
-		else
-			return false;
-	}
-	else if(recovery_method == 18){
-		if((index[recovery_method - 1]& 0x3f) == (m_digest[0] >> 2))
-			return true;
-		else
-			return false;		
-	}
-	else if(recovery_method == 24){
-		if((index[recovery_method - 1]& 0xff) == m_digest[0])
-			return true;
-		else
-			return false;		
-	}
+	// checksum verify
+	if((index[recovery_method - 1] & mask) == (m_digest[0] >> offset))
+		return true;
+	else
+		return false;
+
 	return false;
 }
