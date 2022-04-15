@@ -1035,6 +1035,24 @@ static __INLINE uint32_t uint32_decode(const uint8_t * p_encoded_data)
              (((uint32_t)((uint8_t *)p_encoded_data)[3]) << 24 ));
 }
 
+/**@brief Function for decoding a uint64 value.
+ *
+ * @param[in]   p_encoded_data   Buffer where the encoded data is stored.
+ *
+ * @return      Decoded value.
+ */
+static __INLINE uint64_t uint64_big_decode(const uint8_t * p_encoded_data)
+{
+    return ( (((uint64_t)((uint8_t *)p_encoded_data)[0]) << 56) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[1]) << 48) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[2]) << 40) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[3]) << 32) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[4]) << 24) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[5]) << 16) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[6]) << 8)  |
+             (((uint64_t)((uint8_t *)p_encoded_data)[7]) << 0) );
+}
+
 /**@brief Function for decoding a uint32 value in big-endian format.
  *
  * @param[in]   p_encoded_data   Buffer where the encoded data is stored.
