@@ -298,6 +298,17 @@ ret_code_t nrf_gfx_print(nrf_lcd_t const * p_instance,
                          const nrf_gfx_font_desc_t * p_font,
                          bool wrap);
 
+ret_code_t process_string_in_region(nrf_lcd_t const * p_instance,
+                                    uint16_t point_x, uint16_t point_y,
+                                    uint16_t width,
+                                    uint16_t height,
+                                    const char * string,
+                                    const nrf_gfx_font_desc_t * p_font,
+                                    uint32_t font_color,
+                                    bool wrap,
+                                    int *page,
+                                    bool is_drawing);
+
 /**
  * @brief Function for printing a string to the screen.
  *
@@ -315,9 +326,9 @@ ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
                                      nrf_gfx_point_t const * p_point,
                                      uint16_t width,
                                      uint16_t height,
-                                     uint32_t font_color,
                                      const char * string,
                                      const nrf_gfx_font_desc_t * p_font,
+                                     uint32_t font_color,
                                      bool wrap,
                                      int page);
 /**

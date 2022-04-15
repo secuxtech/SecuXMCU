@@ -650,27 +650,28 @@ ret_code_t nrf_gfx_print(nrf_lcd_t const * p_instance,
     return NRF_SUCCESS;
 }
 
-ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
-                                     nrf_gfx_point_t const * p_point,
-                                     uint16_t width,
-                                     uint16_t height,
-                                     uint32_t font_color,
-                                     const char * string,
-                                     const nrf_gfx_font_desc_t * p_font,
-                                     bool wrap,
-                                     int page)
+ret_code_t process_string_in_region(nrf_lcd_t const * p_instance,
+                                    uint16_t point_x, uint16_t point_y,
+                                    uint16_t width,
+                                    uint16_t height,
+                                    const char * string,
+                                    const nrf_gfx_font_desc_t * p_font,
+                                    uint32_t font_color,
+                                    bool wrap,
+                                    int *page,
+                                    bool is_drawing)
 {
     ASSERT(p_instance != NULL);
     ASSERT(p_instance->p_lcd_cb->state != NRFX_DRV_STATE_UNINITIALIZED);
-    ASSERT(p_point != NULL);
     ASSERT(string != NULL);
     ASSERT(p_font != NULL);
 
-    uint16_t x = p_point->x;
-    uint16_t y = p_point->y;
+    uint16_t x = point_x;
+    uint16_t y = point_y;
+    int _page = 1;
 
     uint16_t right_boundary = 0, bottom_boundary = 0;
-    bool is_word_checking = false;
+    bool is_word_checking_needed = false, is_new_line = true;
     
     // estimate right boundary
     if ((x + width) < nrf_gfx_width_get(p_instance))
@@ -689,109 +690,154 @@ ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
         // Not enough space to write even single char.
         return NRF_ERROR_INVALID_PARAM;
     }
-    
-    int _page = 1;
+
     for (size_t i = 0; string[i] != '\0' ; i++)
     {
         if (string[i] == '\t')
         {
-            x = p_point->x;
-            y += p_font->height;
-            is_word_checking = true;
+            uint16_t char_width = p_font->height;
+
+            if (false == is_new_line)
+            {
+                // start a new line if the char length exceed the regior width
+                // follow the word length checking, will only process ' ' here
+                if ((x + char_width) > right_boundary)
+                {
+                    if (wrap)
+                    {
+                        x = point_x;
+                        y += p_font->height + p_font->height / 10;
+                        is_new_line = true;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    x += char_width;
+                    is_new_line = false;
+                }
+            }
+            is_word_checking_needed = true;
         }
         else if (string[i] == '\n')
         {
-            x = p_point->x;
+            x = point_x;
             y += p_font->height + p_font->height / 10;
-            is_word_checking = true;
+            is_new_line = true;
+            is_word_checking_needed = false;
+        }
+        else if (string[i] == ' ' && true == is_new_line)
+        {
+            // skip the ' ' while the new line
         }
         else
         {
-            // start a new line if the word length exceed the region
-            if (string[i] != ' ')
+            // do not endline while already at the start
+            if (is_new_line == false)
             {
-                if (is_word_checking == true)
+                // start a new line if the word length exceed the region
+                if (string[i] != ' ')
                 {
-                    uint16_t word_width = 0;
-                    for (int j = i; 
-                         string[j] != '\0' && string[j] != '\t' && string[j] != '\n' && 
-                         string[j] != ' '; 
-                         j++)
+                    if (is_word_checking_needed == true)
                     {
-                        uint8_t _char_idx = string[j] - p_font->startChar;
-                        uint16_t _char_width = (p_font->charInfo[_char_idx].widthBits + p_font->spacePixels);
+                        uint16_t word_width = 0;
+                        for (int j = i; 
+                            string[j] != '\0' && string[j] != '\t' && string[j] != '\n' && 
+                            string[j] != ' '; 
+                            j++)
+                        {
+                            uint8_t _char_idx = string[j] - p_font->startChar;
+                            uint16_t _char_width = (p_font->charInfo[_char_idx].widthBits + p_font->spacePixels);
+                            
+                            word_width += _char_width;
+                        }
                         
-                        word_width += _char_width;
-                    }
-                    
-                    if ((x + word_width) > right_boundary)
-                    {
-                        if (wrap)
+                        if ((x + word_width) > right_boundary)
                         {
-                            x = p_point->x;
-                            y += p_font->height + p_font->height / 10;
+                            if (wrap)
+                            {
+                                x = point_x;
+                                y += p_font->height + p_font->height / 10;
+                                is_new_line = true;
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
-                        else
-                        {
-                            break;
-                        }
+                        is_word_checking_needed = false;
                     }
-                    is_word_checking = false;
                 }
+                else
+                    is_word_checking_needed = true;
             }
-            else
-                is_word_checking = true;
 
             // character processing
             uint8_t char_idx = string[i] - p_font->startChar;
             uint16_t char_width = (string[i] == ' ') ? 
                                   (p_font->height / 2) :
                                   (p_font->charInfo[char_idx].widthBits+p_font->spacePixels);
-            bool is_char_wrap = false;
 
-            // start a new line if the char length exceed the regior width
-            // follow the word length checking, will only process ' ' here
-            if ((x + char_width) > right_boundary)
+            if (false == is_new_line)
             {
-                if (wrap)
+                // start a new line if the char length exceed the regior width
+                // follow the word length checking, will only process ' ' here
+                if ((x + char_width) > right_boundary)
                 {
-                    x = p_point->x;
-                    y += p_font->height + p_font->height / 10;
-                    is_char_wrap = true;
-                }
-                else
-                {
-                    break;
+                    if (wrap)
+                    {
+                        x = point_x;
+                        y += p_font->height + p_font->height / 10;
+                        is_new_line = true;
+                        is_word_checking_needed = false;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             
-            if ((y + p_font->height) > bottom_boundary)
+            if ((y + p_font->height) > bottom_boundary && true == is_new_line)
             {
-                if (page <= _page)
+                if ((_page >= *page) && (true == is_drawing))
                     break;
                 else
                 {
                     _page++;
-                    x = p_point->x;
-                    y = p_point->y;
+                    x = point_x;
+                    y = point_y;
                 }
             }
 
-            // skip the ' ' while the new line
-            if (is_char_wrap == true && string[i] == ' ')
-            {
-                // skip ' ' in the first char
-            }
+            if ((_page == *page) && (true == is_drawing))
+                write_character(p_instance, p_font, (uint8_t)string[i], &x, y, font_color);
             else
-            {
-                if (page == _page)
-                    write_character(p_instance, p_font, (uint8_t)string[i], &x, y, font_color);
-                else
-                    x += char_width;
-            }
+                x += char_width;
+            is_new_line = false;
         }
     }
+    *page = _page;
     return NRF_SUCCESS;
+}
+
+ret_code_t nrf_gfx_string_in_region(nrf_lcd_t const * p_instance,
+                                     nrf_gfx_point_t const * p_point,
+                                     uint16_t width,
+                                     uint16_t height,
+                                     const char * string,
+                                     const nrf_gfx_font_desc_t * p_font,
+                                     uint32_t font_color,
+                                     bool wrap,
+                                     int page)
+{
+    ASSERT(p_point != NULL);
+
+    return process_string_in_region(p_instance, p_point->x, p_point->y, width, height,
+                                    string, p_font, font_color, wrap, &page, true);
 }
 
 uint16_t nrf_gfx_height_get(nrf_lcd_t const * p_instance)
