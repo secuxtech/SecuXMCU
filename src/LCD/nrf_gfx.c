@@ -693,36 +693,7 @@ ret_code_t process_string_in_region(nrf_lcd_t const * p_instance,
 
     for (size_t i = 0; string[i] != '\0' ; i++)
     {
-        if (string[i] == '\t')
-        {
-            uint16_t char_width = p_font->height;
-
-            if (false == is_new_line)
-            {
-                // start a new line if the char length exceed the regior width
-                // follow the word length checking, will only process ' ' here
-                if ((x + char_width) > right_boundary)
-                {
-                    if (wrap)
-                    {
-                        x = point_x;
-                        y += p_font->height + p_font->height / 10;
-                        is_new_line = true;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
-                    x += char_width;
-                    is_new_line = false;
-                }
-            }
-            is_word_checking_needed = true;
-        }
-        else if (string[i] == '\n')
+        if (string[i] == '\n')
         {
             x = point_x;
             y += p_font->height + p_font->height / 10;
@@ -739,7 +710,7 @@ ret_code_t process_string_in_region(nrf_lcd_t const * p_instance,
             if (is_new_line == false)
             {
                 // start a new line if the word length exceed the region
-                if (string[i] != ' ')
+                if (string[i] != ' ' && string[i] != '\t')
                 {
                     if (is_word_checking_needed == true)
                     {
@@ -777,9 +748,14 @@ ret_code_t process_string_in_region(nrf_lcd_t const * p_instance,
 
             // character processing
             uint8_t char_idx = string[i] - p_font->startChar;
-            uint16_t char_width = (string[i] == ' ') ? 
-                                  (p_font->height / 2) :
-                                  (p_font->charInfo[char_idx].widthBits+p_font->spacePixels);
+            uint16_t char_width = 0;
+
+            if (string[i] == ' ')
+                char_width = p_font->height / 2;
+            else if (string[i] == '\t')
+                char_width = p_font->height;
+            else
+                char_width = p_font->charInfo[char_idx].widthBits + p_font->spacePixels;
 
             if (false == is_new_line)
             {
@@ -813,10 +789,11 @@ ret_code_t process_string_in_region(nrf_lcd_t const * p_instance,
                 }
             }
 
-            if ((_page == *page) && (true == is_drawing))
+            if ((_page == *page) && (true == is_drawing) && (string[i] != ' ') && (string[i] != '\t'))
                 write_character(p_instance, p_font, (uint8_t)string[i], &x, y, font_color);
             else
                 x += char_width;
+
             is_new_line = false;
         }
     }
