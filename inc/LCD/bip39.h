@@ -7,7 +7,7 @@
 //generate random bit array
 uint8_t random_vector_generate(uint8_t * p_buff, uint8_t size);
 //generate 256 bit random data + 8 bit hash data
-void generate_random_bits(uint8_t* random_buff, uint8_t RANDOM_BUFF_SIZE, nrf_crypto_hash_context_t hash_context);
+void generate_random_bits(uint8_t* random_buff, uint8_t RANDOM_BUFF_SIZE, nrf_crypto_hash_context_t hash_context, uint8_t num_of_mnemonic);
 //change 8*33 bits to 11*24 bits
 void byte_to_11bit(uint8_t * p_input, uint8_t input_size, uint16_t * p_output, uint8_t output_size);
 //create words

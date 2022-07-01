@@ -116,16 +116,68 @@ uint8_t random_vector_generate(uint8_t * p_buff, uint8_t size)
     return ret_code;
 }
 
-void generate_random_bits(uint8_t* random_buff, uint8_t RANDOM_BUFF_SIZE, nrf_crypto_hash_context_t hash_context){
+void generate_random_bits(uint8_t* random_buff, uint8_t RANDOM_BUFF_SIZE, nrf_crypto_hash_context_t hash_context, uint8_t num_of_mnemonic){
 	ret_code_t ret_code = NRF_SUCCESS;
 	nrf_crypto_hash_sha256_digest_t     m_digest;
 	const size_t m_digest_len = NRF_CRYPTO_HASH_SIZE_SHA256;
 	size_t digest_len = m_digest_len;
-	
+
+	int bytes = 0;
+	uint8_t mask = 0;
+	uint8_t offset = 0;
+
+	switch (num_of_mnemonic)
+	{
+		case 12: // ENT = 128 bits, 16 bytes, CS = 4 bits
+		{
+			bytes = 16;
+			mask = 0x0F;
+			offset = 4;
+		}
+		break;
+		case 15: // ENT = 160 bits, 20 bytes, CS = 5 bits
+		{
+			bytes = 20;
+			mask = 0x1F;
+			offset = 3;
+		}
+		break;
+		case 18: // ENT = 192 bits, 24 bytes, CS = 6 bits
+		{
+			bytes = 24;
+			mask = 0x3F;
+			offset = 2;
+		}
+		break;
+		case 21: // ENT = 224 bits, 28 bytes, CS = 7 bits
+		{
+			bytes = 28;
+			mask = 0x7F;
+			offset = 1;
+		}
+		break;
+		case 24: // ENT = 256 bits, 32 bytes, CS = 8 bits
+		{
+			bytes = 32;
+			mask = 0xFF;
+			offset = 0;
+		}
+		break;
+		default:
+			NRF_LOG_INFO("invalid num_of_mnemonic:%d", num_of_mnemonic);
+			return;
+	}
+
+	if (RANDOM_BUFF_SIZE < bytes + 1)
+	{
+		NRF_LOG_INFO("invalid buffer size:%d", RANDOM_BUFF_SIZE);
+		return;
+	}
+
 	do
     {
 		nrf_delay_ms(10);
-		ret_code = random_vector_generate(random_buff, RANDOM_BUFF_SIZE);
+		ret_code = random_vector_generate(random_buff, bytes);
 	}
     while(ret_code != NRF_SUCCESS);
 
@@ -135,11 +187,11 @@ void generate_random_bits(uint8_t* random_buff, uint8_t RANDOM_BUFF_SIZE, nrf_cr
 	nrf_crypto_hash_calculate(&hash_context,                     // Context or NULL to allocate internally
                               &g_nrf_crypto_hash_sha256_info,    // Info structure configures hash mode
                               random_buff,                       // Input buffer
-                              RANDOM_BUFF_SIZE-1,                // Input size
+                              bytes,                // Input size
                               m_digest,                          // Result buffer
                               &digest_len);                      // Result size
 	
-	random_buff[RANDOM_BUFF_SIZE-1] = m_digest[0];
+	random_buff[bytes] = m_digest[0];
 }
 
 void byte_to_11bit(uint8_t * p_input, uint8_t input_size, uint16_t * p_output, uint8_t output_size)
