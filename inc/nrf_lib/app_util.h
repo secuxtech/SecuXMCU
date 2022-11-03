@@ -984,6 +984,26 @@ static __INLINE uint8_t uint48_encode(uint64_t value, uint8_t * p_encoded_data)
     return 6;
 }
 
+/**@brief Function for encoding a uint64 value.
+ *
+ * @param[in]   value            Value to be encoded.
+ * @param[out]  p_encoded_data   Buffer where the encoded data is to be written.
+ *
+ * @return      Number of bytes written.
+ */
+static __INLINE uint8_t uint64_encode(uint64_t value, uint8_t * p_encoded_data)
+{
+    p_encoded_data[0] = (uint8_t) ((value & 0x00000000000000FF) >> 0);
+    p_encoded_data[1] = (uint8_t) ((value & 0x000000000000FF00) >> 8);
+    p_encoded_data[2] = (uint8_t) ((value & 0x0000000000FF0000) >> 16);
+    p_encoded_data[3] = (uint8_t) ((value & 0x00000000FF000000) >> 24);
+    p_encoded_data[4] = (uint8_t) ((value & 0x000000FF00000000) >> 32);
+    p_encoded_data[5] = (uint8_t) ((value & 0x0000FF0000000000) >> 40);
+    p_encoded_data[6] = (uint8_t) ((value & 0x00FF000000000000) >> 48);
+    p_encoded_data[7] = (uint8_t) ((value & 0xFF00000000000000) >> 56);
+    return 8;
+}
+
 /**@brief Function for decoding a uint16 value.
  *
  * @param[in]   p_encoded_data   Buffer where the encoded data is stored.
@@ -1036,6 +1056,24 @@ static __INLINE uint32_t uint32_decode(const uint8_t * p_encoded_data)
 }
 
 /**@brief Function for decoding a uint64 value.
+ *
+ * @param[in]   p_encoded_data   Buffer where the encoded data is stored.
+ *
+ * @return      Decoded value.
+ */
+static __INLINE uint64_t uint64_decode(const uint8_t * p_encoded_data)
+{
+    return ( (((uint64_t)((uint8_t *)p_encoded_data)[0]) << 0)  |
+             (((uint64_t)((uint8_t *)p_encoded_data)[1]) << 8)  |
+             (((uint64_t)((uint8_t *)p_encoded_data)[2]) << 16) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[3]) << 24) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[4]) << 32) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[5]) << 40) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[6]) << 48) |
+             (((uint64_t)((uint8_t *)p_encoded_data)[7]) << 56) );
+}
+
+/**@brief Function for decoding a uint64 value in big-endian format.
  *
  * @param[in]   p_encoded_data   Buffer where the encoded data is stored.
  *
