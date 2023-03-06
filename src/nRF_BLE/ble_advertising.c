@@ -143,8 +143,9 @@ static void on_terminated(ble_advertising_t * const p_advertising, ble_evt_t con
         ||p_ble_evt->evt.gap_evt.params.adv_set_terminated.reason == BLE_GAP_EVT_ADV_SET_TERMINATED_REASON_LIMIT_REACHED)
     {
         // Start advertising in the next mode.
-        ret = ble_advertising_start(p_advertising, adv_mode_next_get(p_advertising->adv_mode_current));
-        ui_bridge_ble_disconnect();        
+        // ret = ble_advertising_start(p_advertising, adv_mode_next_get(p_advertising->adv_mode_current));
+        // ui_bridge_ble_disconnect();        
+        ret = ble_advertising_start(p_advertising, BLE_ADV_MODE_FAST);
 
         if ((ret != NRF_SUCCESS) && (p_advertising->error_handler != NULL))
         {
