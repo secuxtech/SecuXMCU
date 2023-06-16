@@ -87,9 +87,9 @@ int main(void)
     ble_init();
 	wdt_init();
     
-    NRF_LOG_INFO("Hello USB!");
-    NRF_LOG_FLUSH();
-    usb21_init();
+    // NRF_LOG_INFO("Hello USB!");
+    // NRF_LOG_FLUSH();
+    // usb21_init();
     ikv_spim_init();
     lcm_init();
     
@@ -105,6 +105,7 @@ int main(void)
     }
     // Start execution.
     NRF_LOG_INFO("Secux started");
+    NRF_LOG_FLUSH();
     application_timers_start();
     //advertising_start();
     if (is_power_ready == true || option_pin_mode0 == false)

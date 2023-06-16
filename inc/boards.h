@@ -43,7 +43,7 @@
 #include "nrf_gpio.h"
 #include "nordic_common.h"
 
-#include "secuxio.h"
+#include "secuxio_c20.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
