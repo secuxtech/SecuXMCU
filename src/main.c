@@ -92,7 +92,7 @@ int main(void)
     // usb21_init();
     ikv_spim_init();
     lcm_init();
-    
+    twi_init();
     nrf_mem_init();
     
     crypto_init();
