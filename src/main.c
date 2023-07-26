@@ -83,7 +83,9 @@ int main(void)
     gpio_init();
     power_management_init();
     init_fstorage();
-    
+
+    test_init();
+    nfc_init();
     ble_init();
 	wdt_init();
     
