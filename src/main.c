@@ -84,6 +84,7 @@ int main(void)
     power_management_init();
     init_fstorage();
 
+    config_init();
     test_init();
     nfc_init();
     ble_init();
