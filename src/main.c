@@ -83,7 +83,8 @@ int main(void)
     gpio_init();
     power_management_init();
     init_fstorage();
-    
+
+    config_init();
     ble_init();
 	wdt_init();
     
