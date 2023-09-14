@@ -82,39 +82,39 @@ int main(void)
     clock_initialization();
     gpio_init();
     power_management_init();
-    init_fstorage();
+    // init_fstorage();
 
-    config_init();
-    test_init();
-    nfc_init();
-    ble_init();
+    // config_init();
+    // test_init();
+    // nfc_init();
+    // ble_init();
 	wdt_init();
     
     // NRF_LOG_INFO("Hello USB!");
     // NRF_LOG_FLUSH();
     // usb21_init();
     ikv_spim_init();
-    lcm_init();
-    twi_init();
-    nrf_mem_init();
+    // lcm_init();
+    // twi_init();
+    // nrf_mem_init();
     
-    crypto_init();
-    bip39_init();
+    // crypto_init();
+    // bip39_init();
 
-    if(option_pin_mode0 == true)
-    {
-        saadc_init();
-        is_power_ready = check_remaining_battery();
-    }
+    // if(option_pin_mode0 == true)
+    // {
+    //     saadc_init();
+    //     is_power_ready = check_remaining_battery();
+    // }
     // Start execution.
     NRF_LOG_INFO("Secux started");
     NRF_LOG_FLUSH();
     application_timers_start();
     //advertising_start();
-    if (is_power_ready == true || option_pin_mode0 == false)
-    {
+    // if (is_power_ready == true || option_pin_mode0 == false)
+    // {
         start_system();
-    }
+    // }
     // Enter main loop.
     for (;;)
     {
