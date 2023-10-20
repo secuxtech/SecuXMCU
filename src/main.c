@@ -101,7 +101,8 @@ int main(void)
     
     if(option_pin_mode0 == true)
     {
-        is_power_ready = check_remaining_battery();
+        // is_power_ready = check_remaining_battery();
+        is_power_ready = true;
     }
     
     // Start execution.
