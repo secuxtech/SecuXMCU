@@ -55,14 +55,14 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "nrf_log.h"
-#include "nrf_log_ctrl.h"
-
-#include "mem_manager.h"
-#include "common_service.h"
-#include "fstorage_service.h"
 #include "app_usbd_21.h"
 #include "bip39.h"
+#include "battery_service.h"
+#include "common_service.h"
+#include "fstorage_service.h"
+#include "mem_manager.h"
+#include "nrf_log.h"
+#include "nrf_log_ctrl.h"
 
 extern bool option_pin_mode0;
 
@@ -70,10 +70,8 @@ extern bool option_pin_mode0;
  */
 int main(void)
 {
-    uint32_t err_code;
-	uint8_t index = 0;
     bool is_power_ready = false;
-
+    
     // Initialize.
     log_init();
     timers_init();
@@ -83,12 +81,12 @@ int main(void)
     gpio_init();
     power_management_init();
     init_fstorage();
-
+    
     config_init();
     test_init();
     nfc_init();
     ble_init();
-	wdt_init();
+    wdt_init();
     
     // NRF_LOG_INFO("Hello USB!");
     // NRF_LOG_FLUSH();
@@ -100,12 +98,12 @@ int main(void)
     
     crypto_init();
     bip39_init();
-
+    
     if(option_pin_mode0 == true)
     {
-        saadc_init();
         is_power_ready = check_remaining_battery();
     }
+    
     // Start execution.
     NRF_LOG_INFO("Secux started");
     NRF_LOG_FLUSH();
