@@ -88,6 +88,16 @@ int main(void)
     ble_init();
     wdt_init();
     
+    if(option_pin_mode0 == true)
+    {
+        is_power_ready = check_remaining_battery();
+    }
+
+    if (false == is_power_ready)
+    {
+        power_off_gpio();
+        return 0;
+    }
     // NRF_LOG_INFO("Hello USB!");
     // NRF_LOG_FLUSH();
     // usb21_init();
@@ -99,10 +109,6 @@ int main(void)
     crypto_init();
     bip39_init();
     
-    if(option_pin_mode0 == true)
-    {
-        is_power_ready = check_remaining_battery();
-    }
     
     // Start execution.
     NRF_LOG_INFO("Secux started");
