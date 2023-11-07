@@ -80,15 +80,7 @@ int BackToIKVldr(void);
 //int loader_cmdhdlr_LoadsessAuth	(void);
 //int preloader_kv_mac_verify_and_burn(void);
 
-
-#define HID_REPORT_LENGTH 			64
-#define APDU_COMMAND_QUEUE_SIZE 128
-
-extern uint8_t g_apdu_command_received;
-//uint8_t g_apdu_command_processed = 0;
-//uint8_t g_apdu_command_buffer[APDU_COMMAND_QUEUE_SIZE][HID_REPORT_LENGTH] = {0};
-//uint8_t g_apdu_command_response[HID_REPORT_LENGTH] = {0};
-extern uint8_t g_apdu_command_buffer[APDU_COMMAND_QUEUE_SIZE][HID_REPORT_LENGTH];
+uint8_t apdu_receive_data(const uint8_t *data, uint16_t length);
 
 int check_SE_program(void);
 int loader_cmdhdlr_CosJump(void);
@@ -470,18 +462,8 @@ static void hid_user_ev_handler(app_usbd_class_inst_t const * p_inst,
 								p_rep_buffer[i], p_rep_buffer[i+1], p_rep_buffer[i+2], p_rep_buffer[i+3]);
 						}
             */
-						if (g_apdu_command_received == APDU_COMMAND_QUEUE_SIZE)
-						{
-							NRF_LOG_INFO("received command over buffer size");
-							break;
-						}
-						else
-						{
-							//NRF_LOG_INFO("test123, %d" , __LINE__);
-							memcpy(g_apdu_command_buffer[g_apdu_command_received++], p_rep_buffer, buffer_size);
-							NRF_LOG_INFO("received command: index:%d", g_apdu_command_received-1);
-							NRF_LOG_HEXDUMP_INFO(&g_apdu_command_buffer[g_apdu_command_received - 1], buffer_size);
-						}
+                        apdu_receive_data(p_rep_buffer, buffer_size);
+                        NRF_LOG_INFO("received command from USB:");
 						
             break;
         }
