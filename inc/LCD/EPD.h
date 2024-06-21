@@ -31,6 +31,15 @@ uint8_t SUB_GET_TEMPERATURE(nrf_drv_spi_t const * const p_instance);
 uint8_t SUB_DISPLAY_HVs_on(nrf_drv_spi_t const * const p_instance);
 uint8_t SUB_DISPLAY_HVs_off(nrf_drv_spi_t const * const p_instance);
 
+uint8_t SUB_DISPLAY_Clear_whiteORblack(nrf_drv_spi_t const * const	p_instance,
+																uint8_t row_start,
+																uint8_t row_size,
+																uint8_t col_start,
+																uint8_t col_size,
+																uint8_t color,
+																uint8_t grayscale );
+
+
 uint8_t SUB_READ_RAM(nrf_drv_spi_t const * const	p_instance,
                     unsigned char 	* p_rx_buffer,
                     uint8_t col_start,
